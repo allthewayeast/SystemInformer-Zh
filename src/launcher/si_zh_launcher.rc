@@ -1,0 +1,45 @@
+/*
+ * si_zh_launcher.exe 的资源：界面图标 + 版本信息。
+ *
+ * 图标取自仓库的 assets\systemInformer-zh.ico。build.ps1 调用 rc.exe 时会把
+ * assets 目录加进包含路径（/I），所以这里只写文件名，不写相对路径 —— 相对
+ * 路径会跟着 rc 的工作目录变，是不可靠的。
+ *
+ * 这是本 EXE 里唯一的一个图标，于是它同时成为：
+ *   - 资源管理器 / 任务管理器 / 文件属性里显示的文件图标；
+ *   - 无窗口进程的「应用程序图标」—— 启动器用 MB_USERICON 弹的提示框就是它。
+ *
+ * 版本信息里的字符串一律用 ASCII：rc.exe 默认按本地代码页解释输入文件，
+ * 非 ASCII 会在不同语言的构建机上变成乱码。中文只放在 .c 源码里。
+ */
+#include <windows.h>
+#include "resource.h"
+
+IDI_APPICON  ICON  "systemInformer-zh.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION     1,0,0,0
+ PRODUCTVERSION  1,0,0,0
+ FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+ FILEFLAGS       0
+ FILEOS          VOS_NT_WINDOWS32
+ FILETYPE        VFT_APP
+ FILESUBTYPE     VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription",  "System Informer Chinese display layer - launcher"
+            VALUE "FileVersion",      "1.0.0.0"
+            VALUE "InternalName",     "si_zh_launcher"
+            VALUE "OriginalFilename", "si_zh_launcher.exe"
+            VALUE "ProductName",      "SystemInformer-Zh"
+            VALUE "ProductVersion",   "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

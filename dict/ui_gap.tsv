@@ -1,0 +1,649 @@
+group	literal	loc
+entry	# Bytes in all Heaps	plugins\DotNetTools\perfpage.c:297
+entry	# GC Handles	plugins\DotNetTools\perfpage.c:284
+entry	# Gen 0 Collections	plugins\DotNetTools\perfpage.c:220
+entry	# Gen 1 Collections	plugins\DotNetTools\perfpage.c:226
+entry	# Gen 2 Collections	plugins\DotNetTools\perfpage.c:231
+entry	# Induced GC	plugins\DotNetTools\perfpage.c:288
+entry	# Link Time Checks	plugins\DotNetTools\perfpage.c:560
+entry	# of CCWs	plugins\DotNetTools\perfpage.c:375
+entry	# of context bound objects allocated	plugins\DotNetTools\perfpage.c:540
+entry	# of Current Logical Threads	plugins\DotNetTools\perfpage.c:489
+entry	# of Current Physical Threads	plugins\DotNetTools\perfpage.c:493
+entry	# of Current Recognized Threads	plugins\DotNetTools\perfpage.c:498
+entry	# of Exceps Thrown / sec	plugins\DotNetTools\perfpage.c:358
+entry	# of Exceptions Thrown	plugins\DotNetTools\perfpage.c:351
+entry	# of Filters Executed	plugins\DotNetTools\perfpage.c:352
+entry	# of Filters Executed / sec	plugins\DotNetTools\perfpage.c:362
+entry	# of Finallys Executed	plugins\DotNetTools\perfpage.c:353
+entry	# of Finallys Executed / sec	plugins\DotNetTools\perfpage.c:366
+entry	# of IL Bytes Jitted	plugins\DotNetTools\perfpage.c:398
+entry	# of Marshalling	plugins\DotNetTools\perfpage.c:384
+entry	# of Methods Jitted	plugins\DotNetTools\perfpage.c:394
+entry	# of Pinned Objects	plugins\DotNetTools\perfpage.c:310
+entry	# of Sink Blocks in use	plugins\DotNetTools\perfpage.c:316
+entry	# of Stubs	plugins\DotNetTools\perfpage.c:379
+entry	# of TLB exports / sec	plugins\DotNetTools\perfpage.c:390
+entry	# of TLB imports / sec	plugins\DotNetTools\perfpage.c:387
+entry	# of Total Recognized Threads	plugins\DotNetTools\perfpage.c:504
+entry	# Total Committed Bytes	plugins\DotNetTools\perfpage.c:301
+entry	# Total Reserved Bytes	plugins\DotNetTools\perfpage.c:305
+menu	&filescan.io	plugins\OnlineChecks\main.c:537
+menu	&hybrid-analysis.com	plugins\OnlineChecks\main.c:538
+menu	&virustotal.com	plugins\OnlineChecks\main.c:540
+dialog	(unnamed job)	SystemInformer\jobprp.c:380
+dialog	10	SystemInformer\memsrch.c:729
+dialog	<a href="https://www.hybrid-analysis.com/">hybrid-analysis.com</a>	plugins\OnlineChecks\partner.c:128
+menu	<section placeholder>	SystemInformer\mainwnd.c:3737
+column,column2	Action	plugins\ExtendedServices\trigger.c:312
+page	Agent Tools	plugins\AgentTools\main.c:181
+page	Agent Tools - Agents	plugins\AgentTools\main.c:188
+column	Alertable	plugins\ExtendedTools\waitchain.c:923
+column2	Alias	plugins\WindowExplorer\wndprp.c:2189
+entry	Allocated Bytes / sec	plugins\DotNetTools\perfpage.c:345
+column2	Allocation base	SystemInformer\memcfg.c:1029
+column	Allocations (delta)	plugins\ExtendedTools\pooltree.c:973
+column	Allocations (total)	plugins\ExtendedTools\pooltree.c:961
+menu	ANSI	SystemInformer\memsrcht.c:1801
+column	App ID	SystemInformer\proctree.c:202
+entry	AppId	plugins\WindowExplorer\wndprp.c:1579
+column	Architecture	SystemInformer\modlist.c:120
+column	ASLR	SystemInformer\modlist.c:103
+entry	Assembly Search Length	plugins\DotNetTools\perfpage.c:441
+entry	Atom	plugins\WindowExplorer\wndprp.c:1610
+column	Attached PID	SystemInformer\informerwnd.c:3056
+column	Attached process	SystemInformer\informerwnd.c:3055
+column	Attached start key	SystemInformer\informerwnd.c:3057
+column2	Auth rights	plugins\ExtendedTools\tpm.c:767
+entry	Authentication LUID	SystemInformer\tokprp.c:3249
+column	Authentication package	SystemInformer\usrlist.c:1103
+column2	Author	plugins\Updater\options.c:590
+entry	Automation server	plugins\WindowExplorer\wndprp.c:1599
+column2	BackColor	plugins\UserNotes\options.c:184
+entry	Background brush	plugins\WindowExplorer\wndprp.c:1616
+entry	Band	plugins\WindowExplorer\wndprp.c:1604
+column	Base address	SystemInformer\memlist.c:66
+column2	Base Address	SystemInformer\memrslt.c:281
+entry	Base name	plugins\WindowExplorer\wndprp.c:1609
+column	Base priority (actual)	SystemInformer\thrdlist.c:147
+column2	Best	plugins\HardwareDevices\diskdetails.c:826
+column	Binary path	SystemInformer\srvlist.c:148
+column2	Bitmap	SystemInformer\memcfg.c:1023
+column	Bits	SystemInformer\proctree.c:165
+column2	Block duration	plugins\ExtendedTools\pwrgrid.c:560
+menu	Boot Configuration &Log	plugins\ExtendedTools\main.c:316
+column	Bytes (delta)	plugins\ExtendedTools\pooltree.c:976
+column	Bytes (total)	plugins\ExtendedTools\pooltree.c:964
+entry	Bytes in Loader Heap	plugins\DotNetTools\perfpage.c:449
+menu	Ca&ncel I/O	plugins\ExtendedTools\main.c:484
+menu	Cache &Latency	plugins\ExtendedTools\main.c:318
+column	Calls	plugins\AgentTools\options.c:1136
+column	Category	SystemInformer\informerwnd.c:3058
+column	CET	SystemInformer\modlist.c:112
+column	CF Guard	SystemInformer\modlist.c:105
+column	CFG target	SystemInformer\thrdstk.c:1107
+entry	Channels	plugins\DotNetTools\perfpage.c:524
+menu	Check for &updates	plugins\Updater\main.c:126
+column2	Checksum	plugins\ExtendedTools\unldll.c:497
+entry	Class name	plugins\HardwareDevices\deviceprops.c:129
+column	Client	plugins\AgentTools\options.c:1133
+entry	Client address	SystemInformer\sessprp.c:265
+entry	Client display	SystemInformer\sessprp.c:266
+entry	Client name	SystemInformer\sessprp.c:264
+entry	Client rectangle	plugins\WindowExplorer\wndprp.c:1583
+entry	Cloaked	plugins\WindowExplorer\wndprp.c:1603
+column	Code page	SystemInformer\proctree.c:218
+menu	Col&lapse by default	plugins\UserNotes\main.c:2382
+column2	Collapse	plugins\UserNotes\options.c:185
+column	COM apartment	SystemInformer\thrdlist.c:126
+column	COM flags	SystemInformer\thrdlist.c:127
+column2	Comments	plugins\Updater\options.c:591
+column2	Commit	plugins\Updater\options.c:592
+column,column2	Committed	SystemInformer\heapinfo.c:716
+column	Compartment ID	plugins\ExtendedTools\fwtab.c:349
+column	Completion mode	plugins\ExtendedTools\namedpipes.c:363
+column	Configuration	plugins\ExtendedTools\namedpipes.c:355
+menu	Configure IO priority for executable...	plugins\UserNotes\main.c:331
+menu	Configure page priority for executable...	plugins\UserNotes\main.c:332
+menu	Configure priority for executable...	plugins\UserNotes\main.c:330
+entry	Connect time	SystemInformer\sessprp.c:261
+column2	Contention count	SystemInformer\heapinfo.c:1492
+entry	Contention Rate / sec	plugins\DotNetTools\perfpage.c:508
+entry	Context Proxies	plugins\DotNetTools\perfpage.c:528
+column	Context Switches	plugins\ExtendedTools\waitchain.c:920
+entry	Context-Bound Classes Loaded	plugins\DotNetTools\perfpage.c:533
+entry	Context-Bound Objects Alloc / sec	plugins\DotNetTools\perfpage.c:549
+entry	Contexts	plugins\DotNetTools\perfpage.c:537
+column	Control address	SystemInformer\thrdstk.c:1097
+column2	Count	SystemInformer\hndlstat.c:161
+column2	Counter	plugins\DotNetTools\perfpage.c:773
+column	Country	plugins\ExtendedTools\fwtab.c:340
+column	CPU (average)	SystemInformer\proctree.c:226
+column	CPU (kernel)	SystemInformer\proctree.c:227
+column	CPU (relative)	SystemInformer\proctree.c:214
+column	CPU (user)	SystemInformer\proctree.c:228
+column	CPU history	SystemInformer\proctree.c:171
+column	Created	SystemInformer\thrdlist.c:105
+column	Current (delta)	plugins\ExtendedTools\pooltree.c:975
+column	Current (total)	plugins\ExtendedTools\pooltree.c:963
+entry	Current Appdomains	plugins\DotNetTools\perfpage.c:424
+entry	Current Assemblies	plugins\DotNetTools\perfpage.c:433
+entry	Current Classes Loaded	plugins\DotNetTools\perfpage.c:417
+column	Current instances	plugins\ExtendedTools\namedpipes.c:357
+entry	Current Queue Length	plugins\DotNetTools\perfpage.c:481
+entry	Cursor handle	plugins\WindowExplorer\wndprp.c:1615
+column	Cycles	SystemInformer\proctree.c:169
+column	Cycles delta	SystemInformer\proctree.c:170
+column2	Data	plugins\ExtendedServices\trigger.c:1236
+column2	Data Length	plugins\ExtendedTools\firmware.c:250
+column2	Data size	plugins\ExtendedTools\tpm.c:765
+column2	Date	plugins\Updater\options.c:589
+column	Default	SystemInformer\options.c:3426
+entry	Default NP Charge	plugins\ExtendedTools\objprp.c:665
+entry	Default Paged Charge	plugins\ExtendedTools\objprp.c:664
+entry	Default service	plugins\HardwareDevices\deviceprops.c:131
+column	DEP	SystemInformer\proctree.c:174
+menu	Deskto&p Windows...	plugins\WindowExplorer\main.c:178
+column	Desktop	SystemInformer\proctree.c:211
+entry	Device name	plugins\HardwareDevices\deviceprops.c:128
+entry	Dialog control ID	plugins\WindowExplorer\wndprp.c:1595
+entry	Dialog procedure	plugins\WindowExplorer\wndprp.c:1594
+column2	Digest	plugins\ExtendedTools\wbcl.c:1146
+column2	Digest value	plugins\ExtendedTools\wbcl.c:1147
+column	Direction	plugins\ExtendedTools\fwtab.c:325
+entry	Disconnect time	SystemInformer\sessprp.c:262
+page	Disk Devices	plugins\HardwareDevices\main.c:93
+column2	Disk Drives	plugins\HardwareDevices\diskoptions.c:756
+column	DNS domain name	SystemInformer\usrlist.c:1104
+entry	Domain	plugins\HardwareDevices\netdetails.c:52
+menu	DPI	plugins\WindowExplorer\wnddlg.c:650
+column	DPI awareness	SystemInformer\proctree.c:203
+entry	DPI Context	plugins\WindowExplorer\wndprp.c:1600
+column,entry	Driver	plugins\ExtendedTools\pooltree.c:951
+entry	Driver date	plugins\HardwareDevices\deviceprops.c:111
+entry	Driver description	plugins\HardwareDevices\deviceprops.c:110
+entry	Driver Flags	plugins\ExtendedTools\objprp.c:430
+entry	Driver Image	plugins\ExtendedTools\objprp.c:426
+entry	Driver INF	plugins\HardwareDevices\deviceprops.c:113
+entry	Driver INF section	plugins\HardwareDevices\deviceprops.c:114
+entry	Driver provider	plugins\HardwareDevices\deviceprops.c:109
+entry	Driver Service Name	plugins\ExtendedTools\objprp.c:427
+entry	Driver Size	plugins\ExtendedTools\objprp.c:428
+entry	Driver Start Address	plugins\ExtendedTools\objprp.c:429
+entry	Driver version	plugins\HardwareDevices\deviceprops.c:112
+entry	Drop shadow	plugins\WindowExplorer\wndprp.c:1620
+column	Duration	SystemInformer\informerwnd.c:3050
+column2	Efficiency	plugins\UserNotes\options.c:188
+column	Elevation	SystemInformer\proctree.c:166
+column	Enclave base address	SystemInformer\modlist.c:118
+column	Enclave size	SystemInformer\modlist.c:119
+column	Enclave type	SystemInformer\modlist.c:117
+column2	End	SystemInformer\memcfg.c:1026
+column2	Entries	SystemInformer\heapinfo.c:717
+column2	Entry count	SystemInformer\heapinfo.c:1493
+column	Entry point	SystemInformer\modlist.c:110
+entry	Enumerator	plugins\HardwareDevices\deviceprops.c:117
+column	Error control	SystemInformer\srvlist.c:149
+column	Error mode	SystemInformer\proctree.c:217
+column2	Event type	plugins\ExtendedTools\wbcl.c:1145
+entry	Exclusive ownership	plugins\WindowExplorer\wndprp.c:1606
+column	Exit code	SystemInformer\srvlist.c:157
+entry	Extended styles	plugins\WindowExplorer\wndprp.c:1598
+page	ExtendedTools	plugins\ExtendedTools\main.c:142
+column	Failed logon attempts since	SystemInformer\usrlist.c:1113
+column	Fiber	SystemInformer\thrdlist.c:128
+column2	File index	plugins\ExtendedTools\reparse.c:1194
+column	File modified time	SystemInformer\modlist.c:108
+column	File share access	SystemInformer\hndllist.c:98
+column	File size	SystemInformer\modlist.c:109
+column2	Filename	SystemInformer\heapinfo.c:1489
+entry	Finalization Survivors	plugins\DotNetTools\perfpage.c:279
+menu	Firm&ware Table	plugins\ExtendedTools\main.c:314
+entry	First installed	plugins\HardwareDevices\deviceprops.c:102
+entry	Folder path	SystemInformer\tokprp.c:3329
+entry	Font	plugins\WindowExplorer\wndprp.c:1596
+column	FQBN name	plugins\ExtendedTools\fwtab.c:352
+column	Frame	SystemInformer\thrdstks.c:1571
+column	Frame address	SystemInformer\thrdstk.c:1092
+column	Frame distance	SystemInformer\thrdstk.c:1102
+column	Frees (delta)	plugins\ExtendedTools\pooltree.c:974
+column	Frees (total)	plugins\ExtendedTools\pooltree.c:962
+column	GDI handles	SystemInformer\proctree.c:150
+entry	Gen 0 Heap Size	plugins\DotNetTools\perfpage.c:257
+entry	Gen 0 Promoted Bytes / sec	plugins\DotNetTools\perfpage.c:328
+entry	Gen 1 Heap Size	plugins\DotNetTools\perfpage.c:262
+entry	Gen 1 Promoted Bytes / sec	plugins\DotNetTools\perfpage.c:336
+entry	Gen 2 Heap Size	plugins\DotNetTools\perfpage.c:267
+entry	Generic All	plugins\ExtendedTools\objprp.c:711
+entry	Generic Execute	plugins\ExtendedTools\objprp.c:710
+entry	Generic Read	plugins\ExtendedTools\objprp.c:708
+entry	Generic Write	plugins\ExtendedTools\objprp.c:709
+column	Granted access	SystemInformer\findobj.c:575
+column	Granted access (symbolic)	SystemInformer\hndllist.c:91
+column2,page	Graphics Devices	plugins\HardwareDevices\gpuoptions.c:882
+menu	Graphics priority...	plugins\UserNotes\main.c:2389
+column,entry	Group	SystemInformer\hndlprp.c:2962
+column2	Guid	plugins\ExtendedTools\firmware.c:249
+entry	GUID	plugins\HardwareDevices\deviceprops.c:127
+column2	Guid Name	plugins\ExtendedTools\firmware.c:248
+column,column2	Handle	SystemInformer\findobj.c:571
+column	Handle count	SystemInformer\hndllist.c:100
+column	Handle value	SystemInformer\hndllist.c:99
+entry	Hardware IDs	plugins\HardwareDevices\deviceprops.c:124
+column2	Hash	plugins\ExtendedTools\reparse.c:1208
+entry	Heap size	plugins\ExtendedTools\objprp.c:612
+column2	Heap Size	plugins\ExtendedTools\objprp.c:2222
+menu	Highligh&t	plugins\UserNotes\main.c:2383
+menu	Highlight lower filtered	plugins\HardwareDevices\devicetree.c:1593
+menu	Highlight upper filtered	plugins\HardwareDevices\devicetree.c:1592
+column	Home directory	SystemInformer\usrlist.c:1118
+column	Home directory drive	SystemInformer\usrlist.c:1119
+column	Hostname	plugins\NetworkTools\tracetree.c:604
+entry	HWID (Publisher)	SystemInformer\tokprp.c:3357
+entry	HWID (User)	SystemInformer\tokprp.c:3358
+menu	Hybrid-Analysis	plugins\OnlineChecks\main.c:582
+column	Hyper-V service	SystemInformer\netlist.c:143
+column	I/O history	SystemInformer\proctree.c:173
+column	I/O other	SystemInformer\proctree.c:183
+column	I/O other bytes	SystemInformer\proctree.c:186
+column	I/O other delta	SystemInformer\proctree.c:189
+column	I/O read bytes	SystemInformer\proctree.c:184
+column	I/O read+other rate	SystemInformer\proctree.c:152
+column	I/O reads	SystemInformer\proctree.c:181
+column	I/O reads delta	SystemInformer\proctree.c:187
+column	I/O write bytes	SystemInformer\proctree.c:185
+column	I/O write rate	SystemInformer\proctree.c:153
+column	I/O writes	SystemInformer\proctree.c:182
+column	I/O writes delta	SystemInformer\proctree.c:188
+column	Id	plugins\AgentTools\options.c:1131
+column	Ideal processor	SystemInformer\thrdlist.c:117
+column2	Identifier Authority	SystemInformer\tokprp.c:1791
+entry	IL Bytes Jitted / sec	plugins\DotNetTools\perfpage.c:414
+column	Image coherency	SystemInformer\modlist.c:113
+column2	ImageBase	SystemInformer\memmod.c:559
+entry	IME Window	plugins\WindowExplorer\wndprp.c:1605
+column	Impersonation	SystemInformer\thrdlist.c:121
+entry	Impersonation level	SystemInformer\tokprp.c:3247
+column2,entry	Index	SystemInformer\memmod.c:557
+column2	Input	plugins\ExtendedTools\objprp.c:2223
+entry	Input desktop	plugins\ExtendedTools\objprp.c:610
+entry	Installed	plugins\HardwareDevices\deviceprops.c:101
+entry	Installer	plugins\HardwareDevices\deviceprops.c:130
+entry	Instance handle	plugins\WindowExplorer\wndprp.c:1584
+entry	Instance ID	plugins\HardwareDevices\deviceprops.c:119
+column2	Instruction	plugins\ExtendedTools\wswatch.c:471
+column	Interface LUID	plugins\ExtendedTools\fwtab.c:348
+entry	Invalid Attributes	plugins\ExtendedTools\objprp.c:712
+column2	IO priority	plugins\UserNotes\options.c:183
+column	IP Address	plugins\NetworkTools\tracetree.c:603
+entry	IPv4 address	plugins\HardwareDevices\netdetails.c:42
+entry	IPv4 default gateway	plugins\HardwareDevices\netdetails.c:44
+entry	IPv4 DNS address	plugins\HardwareDevices\netdetails.c:45
+entry	IPv4 subnet mask	plugins\HardwareDevices\netdetails.c:43
+entry	IPv6 address	plugins\HardwareDevices\netdetails.c:47
+entry	IPv6 address (temporary)	plugins\HardwareDevices\netdetails.c:48
+entry	IPv6 default gateway	plugins\HardwareDevices\netdetails.c:49
+entry	IPv6 DNS address	plugins\HardwareDevices\netdetails.c:50
+entry	Jit Failures	plugins\DotNetTools\perfpage.c:406
+column	Job Object ID	SystemInformer\proctree.c:209
+column	Kernel CPU time	SystemInformer\proctree.c:159
+column	Kernel stack usage	SystemInformer\thrdlist.c:145
+column	Key modified time	SystemInformer\srvlist.c:152
+column	Kickoff time	SystemInformer\usrlist.c:1121
+column	Language	SystemInformer\thrdstk.c:1108
+entry	Large icon handle	plugins\WindowExplorer\wndprp.c:1613
+entry	Large Object Heap Size	plugins\DotNetTools\perfpage.c:272
+entry	Last arrival	plugins\HardwareDevices\deviceprops.c:103
+column	Last failed logon	SystemInformer\usrlist.c:1115
+entry	Last input time	SystemInformer\sessprp.c:263
+entry	Last removal	plugins\HardwareDevices\deviceprops.c:104
+column	Last status code	SystemInformer\thrdlist.c:124
+column	Last successful logon	SystemInformer\usrlist.c:1114
+column	Last system call	SystemInformer\thrdlist.c:123
+column	Launcher	plugins\AgentTools\options.c:1134
+column,column2	Length	SystemInformer\memrslt.c:282
+column	Line number	SystemInformer\thrdstk.c:1100
+entry	Link speed	plugins\HardwareDevices\netdetails.c:54
+column	Load count	SystemInformer\modlist.c:100
+column	Load reason	SystemInformer\modlist.c:107
+column	Load time	SystemInformer\modlist.c:106
+column	Local address class	plugins\ExtendedTools\fwtab.c:341
+column	Local address scope	plugins\ExtendedTools\fwtab.c:343
+column	Local port service	plugins\ExtendedTools\fwtab.c:346
+entry	Location info	plugins\HardwareDevices\deviceprops.c:121
+entry	Location paths	plugins\HardwareDevices\deviceprops.c:122
+column2	Lock count	SystemInformer\heapinfo.c:1491
+column	Locked WS	SystemInformer\memlist.c:75
+column	Logoff time	SystemInformer\usrlist.c:1120
+column	Logon domain	SystemInformer\usrlist.c:1100
+column	Logon ID	SystemInformer\usrlist.c:1109
+column	Logon server	SystemInformer\usrlist.c:1110
+column,entry	Logon time	SystemInformer\sessprp.c:260
+column	Logon type	SystemInformer\usrlist.c:1102
+column	Longon script	SystemInformer\usrlist.c:1116
+column2	Low impact	plugins\ExtendedTools\pwrgrid.c:558
+entry	Lower-edge driver	plugins\ExtendedTools\objprp.c:488
+entry	Lower-edge driver image	plugins\ExtendedTools\objprp.c:489
+entry	LPAC	SystemInformer\tokprp.c:5078
+column2	Mapped file	SystemInformer\memcfg.c:1035
+entry	Matching ID	plugins\HardwareDevices\deviceprops.c:123
+column	Max instances	plugins\ExtendedTools\namedpipes.c:356
+column2	Maximum	SystemInformer\pagfiles.c:195
+column	Maximum working set	SystemInformer\proctree.c:198
+entry	Memory available	SystemInformer\tokprp.c:3253
+entry	Memory used	SystemInformer\tokprp.c:3252
+entry	Menu handle	plugins\WindowExplorer\wndprp.c:1585
+entry	Menu name	plugins\WindowExplorer\wndprp.c:1617
+column2	Minimum	SystemInformer\pagfiles.c:194
+column	Minimum working set	SystemInformer\proctree.c:197
+column	Mitigation policies	SystemInformer\proctree.c:234
+entry	ModifiedId LUID	SystemInformer\tokprp.c:3250
+column2	Module name	SystemInformer\prpgvdm.c:276
+column	MVID	plugins\DotNetTools\asmpage.c:1120
+column	Namespace	SystemInformer\prpgwmi.c:2541
+column	Native image path	plugins\DotNetTools\asmpage.c:1118
+column2	Network Adapters	plugins\HardwareDevices\netoptions.c:927
+page	Network Devices	plugins\HardwareDevices\main.c:109
+page	NetworkTools	plugins\NetworkTools\main.c:62
+column2	No.	plugins\ExtendedTools\unldll.c:492
+column	Non-paged allocations (delta)	plugins\ExtendedTools\pooltree.c:969
+column	Non-paged allocations (total)	plugins\ExtendedTools\pooltree.c:957
+column	Non-paged bytes (delta)	plugins\ExtendedTools\pooltree.c:972
+column	Non-paged bytes (total)	plugins\ExtendedTools\pooltree.c:960
+column	Non-paged current (delta)	plugins\ExtendedTools\pooltree.c:971
+column	Non-paged current (total)	plugins\ExtendedTools\pooltree.c:959
+column	Non-paged frees (delta)	plugins\ExtendedTools\pooltree.c:970
+column	Non-paged frees (total)	plugins\ExtendedTools\pooltree.c:958
+column2	NonPaged	plugins\ExtendedTools\pooldialogbig.c:114
+column	Nonpaged size	SystemInformer\hndllist.c:103
+entry	Normal rectangle	plugins\WindowExplorer\wndprp.c:1582
+page	Notifications - Devices	plugins\ExtendedNotifications\main.c:344
+page	Notifications - Logging	plugins\ExtendedNotifications\main.c:351
+page	Notifications - Processes	plugins\ExtendedNotifications\main.c:330
+page	Notifications - Services	plugins\ExtendedNotifications\main.c:337
+entry	Number	SystemInformer\tokprp.c:5077
+column2	Object	SystemInformer\gdihndl.c:448
+column,column2	Object address	SystemInformer\findobj.c:573
+entry	Object attributes	plugins\ExtendedTools\objprp.c:389
+column2	Object identifier	plugins\ExtendedTools\reparse.c:1201
+entry	Objects	plugins\ExtendedTools\objprp.c:659
+column2	Offset	SystemInformer\memmod.c:560
+page	OnlineChecks	plugins\OnlineChecks\main.c:304
+entry	Origin LUID	SystemInformer\tokprp.c:3251
+column,column2	Original name	SystemInformer\findobj.c:574
+column	Original pages	SystemInformer\memlist.c:81
+column	Original protection	SystemInformer\memlist.c:80
+column	OS context	SystemInformer\proctree.c:192
+column	Outbound quota	plugins\ExtendedTools\namedpipes.c:359
+column,column2,entry	Owner	SystemInformer\hndlprp.c:2961
+column2	Owner rights	plugins\ExtendedTools\tpm.c:766
+column	Package name	SystemInformer\proctree.c:201
+column,column2	Page priority	SystemInformer\proctree.c:156
+column	Paged allocations (delta)	plugins\ExtendedTools\pooltree.c:965
+column	Paged allocations (total)	plugins\ExtendedTools\pooltree.c:953
+column	Paged bytes (delta)	plugins\ExtendedTools\pooltree.c:968
+column	Paged bytes (total)	plugins\ExtendedTools\pooltree.c:956
+column	Paged current (delta)	plugins\ExtendedTools\pooltree.c:967
+column	Paged current (total)	plugins\ExtendedTools\pooltree.c:955
+column	Paged frees (delta)	plugins\ExtendedTools\pooltree.c:966
+column	Paged frees (total)	plugins\ExtendedTools\pooltree.c:954
+column	Paged size	SystemInformer\hndllist.c:102
+column	Parent base address	SystemInformer\modlist.c:111
+column	Parent console PID	SystemInformer\proctree.c:223
+entry	Parent instance ID	plugins\HardwareDevices\deviceprops.c:120
+column	Parent PID	SystemInformer\proctree.c:222
+column	Password can set	SystemInformer\usrlist.c:1122
+column	Password last set	SystemInformer\usrlist.c:1106
+column	Password must set	SystemInformer\usrlist.c:1123
+column2	PCR	plugins\ExtendedTools\wbcl.c:1144
+entry	PDO name	plugins\HardwareDevices\deviceprops.c:118
+entry	Peak Handles	plugins\ExtendedTools\objprp.c:662
+entry	Peak Objects	plugins\ExtendedTools\objprp.c:661
+column	Peak private bytes	SystemInformer\proctree.c:134
+column2	Peak usage	SystemInformer\pagfiles.c:189
+column	Peak virtual size	SystemInformer\proctree.c:141
+column	Pending IRP	SystemInformer\thrdlist.c:122
+column	PID (Hex)	SystemInformer\proctree.c:213
+column	PID (LXSS)	SystemInformer\proctree.c:232
+menu	Ping	plugins\NetworkTools\tracert.c:1026
+column2	Platform rights	plugins\ExtendedTools\tpm.c:768
+entry	PnP Device Name	plugins\ExtendedTools\objprp.c:492
+column2	PnP Devices	plugins\ExtendedServices\svcpnp.c:744
+column	Policy app ID	plugins\ExtendedTools\fwtab.c:350
+menu	Poo&l Table	plugins\ExtendedTools\main.c:310
+entry	Pool Type	plugins\ExtendedTools\objprp.c:663
+menu	Power &Forecast	plugins\ExtendedTools\main.c:317
+column	Power throttling	SystemInformer\proctree.c:220
+column2	Principal	SystemInformer\hndlprp.c:3169
+column	Priority (symbolic)	SystemInformer\thrdlist.c:101
+column	Priority boost	SystemInformer\proctree.c:225
+column	Priority class	SystemInformer\proctree.c:144
+column	Private bytes delta	SystemInformer\proctree.c:199
+column	Private bytes history	SystemInformer\proctree.c:172
+column	Private WS	SystemInformer\memlist.c:72
+entry	Problem code	plugins\HardwareDevices\deviceprops.c:105
+entry	Problem description	plugins\HardwareDevices\deviceprops.c:106
+entry	Problem status	plugins\HardwareDevices\deviceprops.c:107
+column2,entry	Process ID	plugins\DotNetTools\perfpage.c:249
+column	Process name	SystemInformer\thrdstks.c:1587
+column	ProcessId	plugins\ExtendedTools\waitchain.c:918
+column	Profile path	SystemInformer\usrlist.c:1117
+entry	Promoted Finalization-Memory / sec	plugins\DotNetTools\perfpage.c:340
+entry	Promoted Finalization-Memory from Gen 0	plugins\DotNetTools\perfpage.c:246
+entry	Promoted Memory from Gen 0	plugins\DotNetTools\perfpage.c:236
+entry	Promoted Memory from Gen 1	plugins\DotNetTools\perfpage.c:242
+column2	Property	SystemInformer\plugman.c:1145
+entry	Property page provider	plugins\HardwareDevices\deviceprops.c:133
+column,column2	Protection	SystemInformer\memcfg.c:1034
+column	Protocol	SystemInformer\netlist.c:135
+column	Provider	SystemInformer\prpgwmi.c:2540
+entry	Queue Length / sec	plugins\DotNetTools\perfpage.c:512
+entry	Queue Length Peak	plugins\DotNetTools\perfpage.c:484
+page	RAPL Devices	plugins\HardwareDevices\main.c:117
+column2	RAPL Drives	plugins\HardwareDevices\poweroptions.c:940
+entry	Rate of Appdomains	plugins\DotNetTools\perfpage.c:461
+entry	Rate of Appdomains Unloaded	plugins\DotNetTools\perfpage.c:473
+entry	Rate of Assemblies	plugins\DotNetTools\perfpage.c:465
+entry	Rate of Classes Loaded	plugins\DotNetTools\perfpage.c:457
+entry	Rate of Load Failures	plugins\DotNetTools\perfpage.c:469
+entry	Rate of Recognized Threads / sec	plugins\DotNetTools\perfpage.c:516
+column2	Raw	plugins\HardwareDevices\diskdetails.c:827
+column2	Raw (Hex)	plugins\HardwareDevices\diskdetails.c:828
+column	Read data available	plugins\ExtendedTools\namedpipes.c:358
+column	Read mode	plugins\ExtendedTools\namedpipes.c:362
+column	Read rate	plugins\ExtendedTools\disktab.c:310
+column	Read rate average	plugins\ExtendedTools\disktab.c:307
+entry	Receive discards	plugins\HardwareDevices\netdetails.c:90
+entry	Receive errors	plugins\HardwareDevices\netdetails.c:87
+entry	Received	plugins\HardwareDevices\netdetails.c:56
+entry	Received packets	plugins\HardwareDevices\netdetails.c:63
+entry	Receiving	plugins\HardwareDevices\netdetails.c:59
+entry	Rectangle	plugins\WindowExplorer\wndprp.c:1581
+column2	Recursion count	SystemInformer\heapinfo.c:1494
+column	Reference count	SystemInformer\hndllist.c:101
+column	References	SystemInformer\proctree.c:231
+menu	Refresh automatically	plugins\HardwareDevices\devicetree.c:1584
+column2	Region base	SystemInformer\memcfg.c:1030
+column2	Region size	SystemInformer\memcfg.c:1031
+column	Region type	SystemInformer\memlist.c:82
+entry	Registry path	SystemInformer\tokprp.c:3330
+column	Relative start time	SystemInformer\proctree.c:164
+column	Remote address	SystemInformer\netlist.c:133
+column	Remote address class	plugins\ExtendedTools\fwtab.c:342
+column	Remote address scope	plugins\ExtendedTools\fwtab.c:344
+entry	Remote Calls / sec	plugins\DotNetTools\perfpage.c:545
+column	Remote clients	plugins\ExtendedTools\namedpipes.c:361
+column	Remote hostname	SystemInformer\netlist.c:141
+column	Remote port	SystemInformer\netlist.c:134
+column	Remote port service	plugins\ExtendedTools\fwtab.c:347
+column2	Reparse tag	plugins\ExtendedTools\reparse.c:1195
+column2	Resource type	plugins\HardwareDevices\deviceprops.c:974
+column	Response time (ms)	plugins\ExtendedTools\disktab.c:317
+static	Restore default...	SystemInformer\options.c:1542
+column,column2	Result	SystemInformer\informerwnd.c:3061
+column	Return address	SystemInformer\thrdstk.c:1098
+column2	RID	SystemInformer\tokprp.c:1792
+column	RPC usage	SystemInformer\thrdlist.c:146
+column	Rule	plugins\ExtendedTools\fwtab.c:326
+menu	Save &for this command line	plugins\UserNotes\main.c:2184
+entry	Save bits	plugins\WindowExplorer\wndprp.c:1621
+menu	Scan with	plugins\OnlineChecks\main.c:580
+column2	SDDL	plugins\ExtendedTools\reparse.c:1211
+entry	Security descriptor	plugins\HardwareDevices\deviceprops.c:116
+column2	SecurityID	plugins\ExtendedTools\reparse.c:1207
+menu	Sen&d to	plugins\OnlineChecks\main.c:536
+entry	Send discards	plugins\HardwareDevices\netdetails.c:89
+entry	Send errors	plugins\HardwareDevices\netdetails.c:86
+entry	Sending	plugins\HardwareDevices\netdetails.c:58
+entry	Sent	plugins\HardwareDevices\netdetails.c:55
+entry	Sent packets	plugins\HardwareDevices\netdetails.c:62
+menu	Ser&vices	plugins\ExtendedServices\main.c:152
+column,entry	Service	SystemInformer\modlist.c:116
+column	Service SIDs	plugins\ExtendedTools\fwtab.c:351
+column	Session grants	plugins\AgentTools\options.c:1137
+column,entry	Session ID	SystemInformer\proctree.c:143
+entry	Session Name	plugins\ExtendedTools\objprp.c:772
+menu	Set &affinity	plugins\UserNotes\main.c:2181
+menu	Set &boost	plugins\UserNotes\main.c:2204
+menu	Set &efficiency mode	plugins\UserNotes\main.c:2237
+column2	Setting	plugins\HardwareDevices\deviceprops.c:975
+column2	Severity	plugins\ExtendedTools\pwrgrid.c:557
+column	Shareable WS	SystemInformer\memlist.c:73
+column	Shared commit	SystemInformer\proctree.c:224
+column	Shared WS	SystemInformer\memlist.c:74
+column	Short user name	SystemInformer\proctree.c:236
+menu	Show device interfaces	plugins\HardwareDevices\devicetree.c:1588
+menu	Show disabled device interfaces	plugins\HardwareDevices\devicetree.c:1589
+menu	Show disconnected devices	plugins\HardwareDevices\devicetree.c:1586
+menu	Show software components	plugins\HardwareDevices\devicetree.c:1587
+column,column2,entry	SID	SystemInformer\tokprp.c:1788
+column	Signing level	SystemInformer\memlist.c:79
+column2	size (KB) [cycles]	plugins\ExtendedTools\cacheprp.c:1213
+menu	SM&BIOS	plugins\ExtendedTools\main.c:312
+entry	Small icon handle	plugins\WindowExplorer\wndprp.c:1614
+menu	Sort child devices	plugins\HardwareDevices\devicetree.c:1590
+menu	Sort root devices	plugins\HardwareDevices\devicetree.c:1591
+menu	St&op	plugins\ExtendedServices\main.c:187
+menu	Sta&rt	plugins\ExtendedServices\main.c:184
+column	Stack address	SystemInformer\thrdstk.c:1091
+column	Stack parameter #1	SystemInformer\thrdstk.c:1093
+column	Stack parameter #2	SystemInformer\thrdstk.c:1094
+column	Stack parameter #3	SystemInformer\thrdstk.c:1095
+column	Stack parameter #4	SystemInformer\thrdstk.c:1096
+column	Stack usage	SystemInformer\thrdlist.c:133
+column	Stack valid	SystemInformer\thrdstk.c:1105
+entry	Stack Walk Depth	plugins\DotNetTools\perfpage.c:570
+column2	Start	SystemInformer\ntobjprp.c:710
+column	Start address	SystemInformer\thrdstks.c:1585
+column	Start address (Native)	SystemInformer\thrdlist.c:144
+column	Start address (symbolic)	SystemInformer\thrdstks.c:1586
+column	Start address (Win32)	SystemInformer\thrdlist.c:100
+column	Start key	SystemInformer\informerwnd.c:3054
+column	Start module	SystemInformer\thrdlist.c:106
+column	Start type	SystemInformer\srvlist.c:146
+column2	Starts in	plugins\ExtendedTools\pwrgrid.c:561
+column	String	SystemInformer\memsrcht.c:1266
+column	Structure	plugins\DotNetTools\asmpage.c:1114
+entry	Styles	plugins\WindowExplorer\wndprp.c:1597
+column	Subprocesses	SystemInformer\proctree.c:208
+column	Subsystem	SystemInformer\proctree.c:200
+column,column2	Symbol	SystemInformer\memcfg.c:1028
+static	System Informer is not the default Task Manager:	SystemInformer\options.c:1546
+column	Tag Name	plugins\ExtendedTools\pooltree.c:950
+column2	Target	plugins\ExtendedTools\objmgr.c:2933
+column2	Task Id	SystemInformer\prpgvdm.c:279
+column,column2	Text	plugins\WindowExplorer\wndprp.c:3539
+column,column2,entry	Thread	SystemInformer\heapinfo.c:1490
+column2	Thread ID	plugins\WindowExplorer\wndprp.c:3541
+column2	Thread Id	SystemInformer\prpgvdm.c:278
+column	Thread local storage	SystemInformer\proctree.c:230
+column	Thread name	SystemInformer\thrdstks.c:1588
+column	ThreadId	plugins\ExtendedTools\waitchain.c:917
+entry	Throw To Catch Depth / sec	plugins\DotNetTools\perfpage.c:370
+column	TID	SystemInformer\informerwnd.c:3053
+column	TID (hex)	SystemInformer\thrdlist.c:119
+column	TID (LXSS)	SystemInformer\thrdlist.c:141
+column	Time 1	plugins\NetworkTools\tracetree.c:599
+column	Time 2	plugins\NetworkTools\tracetree.c:600
+column	Time 3	plugins\NetworkTools\tracetree.c:601
+column	Time 4	plugins\NetworkTools\tracetree.c:602
+column2	Time Stamp	plugins\ExtendedTools\unldll.c:496
+column	Time stamp	SystemInformer\modlist.c:104
+column	Timeline	SystemInformer\modlist.c:114
+column	Timeout	plugins\ExtendedTools\waitchain.c:922
+column	Timestamp	plugins\ExtendedTools\fwtab.c:336
+entry	Token LUID	SystemInformer\tokprp.c:3248
+entry	Token object path	SystemInformer\tokprp.c:3254
+entry	Token SDDL	SystemInformer\tokprp.c:3255
+column	Tool	plugins\AgentTools\options.c:617
+menu	Toolbar	plugins\ToolStatus\main.c:1824
+page	ToolStatus	plugins\ToolStatus\main.c:2045
+entry	Top level	plugins\WindowExplorer\wndprp.c:1602
+entry	Total # of Contentions	plugins\DotNetTools\perfpage.c:477
+entry	Total # of IL Bytes Jitted	plugins\DotNetTools\perfpage.c:402
+entry	Total # of Load Failures	plugins\DotNetTools\perfpage.c:445
+entry	Total Appdomains	plugins\DotNetTools\perfpage.c:428
+entry	Total Appdomains Unloaded	plugins\DotNetTools\perfpage.c:453
+entry	Total Assemblies	plugins\DotNetTools\perfpage.c:438
+column	Total bytes	plugins\ExtendedTools\disktab.c:315
+entry	Total Bytes Allocated (since start)	plugins\DotNetTools\perfpage.c:319
+entry	Total Bytes Allocated for Large Objects (since start)	plugins\DotNetTools\perfpage.c:322
+entry	Total Classes Loaded	plugins\DotNetTools\perfpage.c:420
+column	Total CPU time	SystemInformer\proctree.c:158
+entry	Total discards	plugins\HardwareDevices\netdetails.c:91
+entry	Total errors	plugins\HardwareDevices\netdetails.c:88
+entry	Total packets	plugins\HardwareDevices\netdetails.c:64
+column	Total rate	plugins\ExtendedTools\disktab.c:312
+column	Total rate average	plugins\ExtendedTools\disktab.c:309
+entry	Total Remote Calls	plugins\DotNetTools\perfpage.c:520
+entry	Total Runtime Checks	plugins\DotNetTools\perfpage.c:555
+column	Total WS	SystemInformer\memlist.c:71
+column2	Trigger	plugins\ExtendedServices\trigger.c:311
+entry	TrustLevel Name	SystemInformer\tokprp.c:3301
+entry	TrustLevel Sid	SystemInformer\tokprp.c:3300
+column	TTL	plugins\NetworkTools\tracetree.c:598
+entry,menu	Unicode	SystemInformer\memsrcht.c:1802
+static	Unknown network adapter	plugins\HardwareDevices\netdetails.c:638
+column	Unwind	SystemInformer\thrdstk.c:1106
+page	Updater	plugins\Updater\main.c:207
+menu	Upload file to &Filescan...	plugins\OnlineChecks\main.c:519
+menu	Upload file to &Hybrid-Analysis...	plugins\OnlineChecks\main.c:520
+menu	Upload file to &Jotti...	plugins\OnlineChecks\main.c:522
+menu	Upload file to &VirusTotal...	plugins\OnlineChecks\main.c:521
+entry	Upper-edge driver	plugins\ExtendedTools\objprp.c:490
+entry	Upper-edge driver Image	plugins\ExtendedTools\objprp.c:491
+column,column2	Use	SystemInformer\memlist.c:70
+column2	Used	SystemInformer\heapinfo.c:715
+column	User CPU time	SystemInformer\proctree.c:160
+entry	User data	plugins\WindowExplorer\wndprp.c:1586
+column	User flags	SystemInformer\usrlist.c:1112
+column	USER handles	SystemInformer\proctree.c:151
+column	User principal name	SystemInformer\usrlist.c:1111
+entry	User SID	plugins\ExtendedTools\objprp.c:611
+column	Username	SystemInformer\srvlist.c:158
+page	UserNotes	plugins\UserNotes\main.c:308
+entry	Utilization	plugins\HardwareDevices\netdetails.c:60
+entry	Valid Access Mask	plugins\ExtendedTools\objprp.c:707
+column	Verification status	SystemInformer\modlist.c:101
+column	Verified signer	SystemInformer\modlist.c:102
+column	Virtualized	SystemInformer\proctree.c:175
+menu	virusscan.&jotti.org	plugins\OnlineChecks\main.c:539
+menu	VirusTotal	plugins\OnlineChecks\main.c:581
+column2	Volume	plugins\ExtendedTools\reparse.c:1206
+menu	Wait Chain Tra&versal	plugins\ExtendedTools\main.c:452
+column	Wait time	SystemInformer\thrdlist.c:134
+column2	Waiting exclusive count	SystemInformer\heapinfo.c:1496
+column2	Waiting shared count	SystemInformer\heapinfo.c:1495
+column	WaitTime	plugins\ExtendedTools\waitchain.c:921
+menu	Whois	plugins\NetworkTools\tracert.c:1028
+entry	Window extra bytes	plugins\WindowExplorer\wndprp.c:1592
+entry	Window handle	plugins\WindowExplorer\wndprp.c:1589
+entry	Window message-only	plugins\WindowExplorer\wndprp.c:1591
+entry	Window procedure	plugins\WindowExplorer\wndprp.c:1593
+column	Window status	SystemInformer\proctree.c:168
+entry	Window text	plugins\WindowExplorer\wndprp.c:1588
+column	Window title	SystemInformer\proctree.c:167
+entry	Window unique id	plugins\WindowExplorer\wndprp.c:1590
+entry	WMI	SystemInformer\options.c:4001
+column	Write rate	plugins\ExtendedTools\disktab.c:311
+column	Write rate average	plugins\ExtendedTools\disktab.c:308

@@ -1,0 +1,1348 @@
+# System Informer 中文词典
+# 格式: 原文<TAB>译文      # 开头为注释
+# 编码: UTF-8 无 BOM（加载器用 MultiByteToWideChar(CP_UTF8)）
+# 替换时机: 整串精确相等（另有「去掉 & 后再查一次」的兜底）
+#
+# 本文件由 _work\dict\build_zh_dict.py 生成扁平表，
+# 再由 _work\dict\organize.py 按类别重组。改词直接改这里即可，
+# 但下次重跑 organize.py 会覆盖 —— 要长期保留请写进 ui_zh.py / 第 1 段基线。
+#
+# 出处不写在条目行里：加载器按第一个 TAB 切分，行尾加注释会把注释吃进译文。
+# 逐条出处见 _work\dict\zh_dict.index.tsv（原文/译文/类别/证据/出处）。
+#
+# ------------------------------------------------------------
+# 关于「字符串表 / 消息表 / 菜单」这几个资源类型：
+#   把源码 34 个 .rc 全扫了一遍，System Informer **只有**：
+#     DIALOG     274 个块 / 732 个唯一字面量   -> [01]
+#     VERSIONINFO 18 个块 /  48 个唯一字面量   -> [02]
+#     ACCELERATORS 3 个块（无一可译文本）
+#   STRINGTABLE = 0 个，MESSAGE TABLE = 0 个，MENU = 0 个。
+#   它的菜单是 menubar.c 里用代码搭的，字符串是 C 字面量 ——
+#   所以「字符串表 / 消息表」在这个程序上不存在对应资源，
+#   只能用代码侧等价分区代替（见下面的判据）。
+#
+# [09] 提示与消息 现在是 0 条，这不是漏了：
+#   全树消息类 API 只有 45 处调用（PhShowMessage2 28 / PhShowError 6 /
+#   PhShowMessage 5 / MessageBoxW 3 / MessageBox 2 / PhShowWarning 1），
+#   这些调用点的字面量目前都还没进词典。
+#   运行时的未命中收集（zh_dict.missed.txt + merge_missed.py）会把它们补进来。
+# ------------------------------------------------------------
+#
+# 分区索引：
+#   [01] 对话框 (DIALOG)                  387 条   <- 源码 .rc 的 DIALOGEX 块 + 控件文本 API
+#   [02] 版本信息 (VERSIONINFO)              6 条   <- 源码 version.rc 的 VERSIONINFO 块
+#   [03] 菜单 (MENU)                     201 条   <- menubar.c/mainwnd.c 的菜单串（含 & 加速键）
+#   [04] 工具栏与按钮 (TOOLBAR)               17 条   <- plugins\ToolStatus\toolbar.c 等
+#   [05] 列表与树 · 列头 (COLUMN)            124 条   <- PhAddListViewColumn / PhAddTreeNewColumn 的列标题
+#   [06] 选项页 (SETTINGS)                 56 条   <- options.c 的设置项与页签
+#   [07] 属性页字段 (PROPERTY)               37 条   <- *prp.c / 进程·线程·内存属性页
+#   [08] 插件 (PLUGIN)                   155 条   <- plugins\*（未被上面更具体的 API 判据收走的）
+#   [09] 提示与消息 (MESSAGE)                 0 条   <- PhShowMessage / PhShowError / PhShowWarning
+#   [10] 其他代码内字符串 (CODE)               182 条   <- 有源码出处，但不在上述任何控件上下文里
+#   [11] 外部数据与系统名称 (EXTERNAL)           52 条   <- 源码里搜不到：Windows 进程名/描述、外部数据、人工补的条目
+#   [12] 运行时未命中（自动收集·待翻译）                0 条   <- 运行时自动收集，译文留空待翻译
+#   [13] 数据行内容（按来源·勿译）                   0 条   <- 指纹判定为列表里的对象名，勿译
+#   合计                                1217 条
+#
+
+# ============================================================
+# [01] 对话框 (DIALOG)    387 条
+#   判据: 源码 .rc 的 DIALOGEX 块 + 控件文本 API
+# ============================================================
+&Browse...	浏览...
+&Empty	空
+&More	更多
+&Ok	确定
+&Open:	打开：
+&Pause	暂停
+&Scan	扫描
+&Show one graph per CPU	显示每个 &CPU 图形
+&Start	启动
+(Repurposed)	(改变用途)
+< Hide	<隐藏
+<a>Company name link</a>	<a>公司名称链接</a>
+<a>Open</a>	<a>打开</a>
+Abandoned:	已放弃：
+Acquire	获取
+Active columns:	活动列：
+Active processes	活动进程
+Adapter	适配器
+Add	添加
+Add...	添加...
+Advanced	高级
+Affinity controls which CPUs threads are allowed to execute on.	亲和性控制允许线程上执行的 CPU。
+Allocs delta	分配
+Alt	&Alt
+Application font:	应用字体：
+Apply	应用
+Attach	附加
+Author:	作者：
+Auto-scroll	自动滚动
+Automatic	自动
+Bad	坏
+Binary path:	二进制路径：
+Browse	浏览...
+Browse...	浏览...
+C&ontinue	继续
+Cache WS	缓存 WS
+Cancel	取消
+Capture Hypervisor pages	捕获虚拟机管理程序页面
+Capture user pages	捕获用户页面
+Changes may require a restart to take effect.	更改需要重新启动后才能生效。
+Choose columns...	选择列...
+Cleanup	清理
+Clear	清除
+Close	关闭
+Command line:	命令行：
+Command:	命令：
+Commit charge	提交用量
+Commit charge:	提交用量：
+Compress memory pages	压缩内存页
+Connection type:	连接类型：
+Content layout	内容布局
+Context switches	上下文切换
+Context switches delta	上下文切换
+Copy	复制
+Copyright (c) Winsider Seminars && Solutions, Inc.	版权所有 (c) Winsider Seminars && Solutions, Inc.
+Cores	核心
+Count:	计数：
+CPU	CPU
+CPU name	CPU 名称
+Create suspended	创建挂起
+Create this task with Administrative privileges.	使用管理权限创建此任务。
+Create this task with TrustedInstaller privileges.	使用 &TrustedInstaller 权限创建此任务。
+Create UIAccess	创建 &UIAccess
+Creating the dump file...	正在创建转储文件...
+Credits.	鸣谢。
+Ctrl	&Ctrl
+Current	当前
+Current count:	当前计数：
+Current directory:	当前目录：
+Default token	默认令牌
+Deferred procedure calls	延迟过程调用
+Delayed start	延迟启动
+Delete	删除
+Deltas	增量
+Description:	描述：
+Deselect all	取消全选
+Desktop:	桌面：
+Details	详细信息
+Detect Unicode	检测 &Unicode
+Diagnostics	诊断
+Disable all	禁用所有
+Disabled	已禁用
+Disabled / Hyper-V	已禁用 / Hyper-V
+Disabled plugins (0)	禁用的插件 (0)
+Disk	磁盘
+Display name:	显示名称：
+Double-click an item to change it.	双击某个项目即可对其进行更改。
+DPCs	DPC
+DPCs delta	DPC
+Driver WS	驱动 WS
+Edit	编辑
+Edit Text	编辑文本
+Elevated:	提升：
+Enable	启用
+Enable all	启用所有
+Enable theme support (experimental)	启用主题支持（实验性）
+Enabled	已启用
+Enter the command to start as the specified package.	输入命令以启动指定包。
+Enter the command to start as the specified user.	输入命令以指定的用户身份启动。
+Error control:	错误控制：
+Exception dispatches	异常分派
+Extended Unicode	扩展的 U&nicode
+File	文件
+File name:	文件名：
+Filter	过滤
+Filter memory	筛选内存
+Filter module paths	筛选模块路径
+Filter write-combined memory	筛选写入组合内存
+Find	查找
+Find window	查找窗口
+Font...	字体...
+Form factor	外形规格
+Free	可用
+Frees delta	释放
+Games	游戏
+General	常规
+Go to...	转到...
+Graph history length:	图表历史记录长度：
+Graph layout	图形布局
+Group:	组：
+Handles	句柄
+Hardware	硬件
+Highlighting duration:	高亮持续时间：
+I/O deltas	I/O 增量
+I/O totals	I/O 总数
+Icon processes:	图标进程：
+Icon:	图标：
+Ignore inaccessible memory	忽略无法访问的内存
+Image	映像
+Image file name (Win32):	映像文件名称 (Win32)：
+Image file name:	映像文件名称：
+Image type:	映像文件类型：
+Image:	镜像：
+Inactive columns:	待用列：
+Include nonessential Hypervisor pages	包括不必要的虚拟机管理程序页面
+Input Prompt	输入提示
+Inspect	检查
+Integrity	完整性
+Internal name:	内部名称：
+Interrupts	中断
+Interrupts delta	中断
+Kernel time	内核时间
+Kernel time (period)	内核时间 (周期)
+Kernel WS	内核 WS
+L1 cache	L1 缓存
+L2 cache	L2 缓存
+L3 cache	L3 缓存
+Latency	延迟
+Lazy start	延迟启动
+Limit	限制
+Limits:	限制：
+Linked token	链接令牌
+Linked Token	链接的令牌
+List	列表
+Logical processors	逻辑处理器
+LUID:	LUID：
+Make default...	设为默认...
+Mapped	映射
+Mapped IO	映射的 IO
+Mapped reads	映射读取
+Mapped writes	映射写入
+Mapped writes delta	映射写入
+Max. size unit:	最大大小单位：
+Maximum count:	最大计数：
+Memory	内存
+Memory lists	内存列表
+Memory type	内存类型
+Minimum length:	最小长度：
+Mitigation policies:	缓解策略：
+Modified	修改时间
+Modified no-write	修改不写
+Modified pagefile	修改页面文件
+Monospace...	等宽字体...
+Move down	下移
+Move Down	下移
+Move up	上移
+Move Up	上移
+Name:	名称：
+Network	网络
+New	新建
+New objects	新对象
+New objects:	新对象：
+New value:	新值：
+Non-paged pool	非分页池
+None	无
+Normal	正常
+Not capable	不支持
+NTFS Object Identifiers	NTFS 对象标识符
+NTFS Reparse Points	NTFS 重解析点
+NTFS Security Descriptors	NTFS 安全描述符
+NTFS SecurityID	NTFS 安全 ID
+OK	确定
+Only kernel thread stacks	仅内核线程堆栈
+Open	打开
+Option	选项
+Options	选项
+Options...	选项...
+Other	其它
+Other bytes	其它字节
+Other bytes delta	其它字节
+Other bytes:	其他字节：
+Other delta	其它
+Owner:	所有者：
+Page faults	页面错误
+Page faults delta	页面错误
+Page reads delta	页面读取
+Paged pool	分页池
+Pagefile writes delta	页面文件写入
+Paging	分页
+Panel layout	面板布局
+Parent console:	父控制台：
+Parent process:	父：
+Parent:	父：
+password	密码
+Password:	密码：
+Pause	暂停
+PE viewer:	PE 查看器：
+Peak	峰值
+Peak job usage	工作使用峰值
+Peak process usage	进程使用峰值
+Pending...	正在处理...
+Permissions	权限
+Persist tray icon layout	保留托盘图标布局
+Physical memory	物理内存
+Physical memory:	物理内存：
+Pin	停靠
+Please wait...	请稍候...
+Plugin	插件
+Policy	策略
+Primary group:	初始组：
+Priority 0	优先级 0
+Priority 1	优先级 1
+Priority 2	优先级 2
+Priority 3	优先级 3
+Priority 4	优先级 4
+Priority 5	优先级 5
+Priority 6	优先级 6
+Priority 7	优先级 7
+Private	私有的
+Private bytes	私有字节
+Process	进程
+Processes	进程
+Processes highlighted red are hidden while those highlighted grey have terminated.	高亮红色为隐藏的进程， 高亮灰色为已终止的进程。
+Processes in job:	工作进程：
+Program:	程序：
+Progress	进度
+Properties	属性
+Property Editor	属性编辑器
+Protection:	保护：
+Pull	拉取
+Pulse	脉冲
+Re-read	重读
+Read bytes	读取字节
+Read bytes delta	读取字节
+Read bytes:	读取字节：
+Reads	读取
+Reads delta	读取
+Ready	就绪
+Refresh	刷新
+Release	释放
+Remove	移除
+Removed objects	移除对象
+Removed objects:	移除对象：
+Rename	重命名
+Reserved	保留
+Reset	重置
+Reset layout	重置布局
+Restore default...	还原默认值...
+Results.	结果。
+Run	运行
+S&top	停止
+Save	保存
+Save...	保存...
+Scan inaccessible partial pages	扫描无法访问的部分页面
+Scan memory	扫描内存
+Search engine:	搜索引擎：
+Search in the following types of memory regions:	在以下类型的内存区域中搜索:
+Section	节
+Select a process from the list below.	从下面的列表中选择一个进程：
+Select all	全选
+Select the columns that will appear in the list.	选择要在列表中显示的列。
+Select the identity for access to the package file system and registry.	选择用于访问包文件系统和注册表的标识。
+Service DLL:	服务 DLL：
+Services	服务
+Session ID:	会话 ID：
+Session:	会话 ID：
+Set	设置
+Set high	设置高
+Set low	设置低
+Setting Editor	设置编辑器
+Shift	&Shift
+Show >	显示>
+Show commit charge instead of physical memory in summary view	在摘要视图中显示提交用量而不是物理内存
+Show processes for all users	显示所有用户的进程
+Show text	显示文字
+Signaled:	信号：
+Single-click tray icons	单击托盘图标
+Sizes in bytes	字节大小
+Slots used	使用的插槽
+Sockets	插槽
+Source	来源
+Speed	速度
+Speed:	速度：
+Standby	备用
+Start type:	启动类型：
+Started:	开始：
+Statistics	统计
+Status	状态
+Supported:	支持：
+Symbol path:	符号路径：
+System	系统
+System calls	系统调用
+System calls delta	系统调用
+System Informer is not the default Task Manager:	System Informer 不是默认任务管理器：
+System Informer is the default Task Manager:	System Informer 是默认任务管理器：
+Tag	标记
+Technology	技术
+Terminate	终止
+Terminated due to job limits	因作业限制而终止
+Terminated:	终止：
+Text:	文本：
+Theme mode:	主题模式：
+Threads	线程
+Time	时间
+Timeout (s):	超时 (秒)：
+Title:	标题：
+To end the remote control session, press this key and the modifiers selected below:	若要结束远程控制会话，请按此键和下面选择的修饰符：
+Toggle elevation	切换高程
+Token	令牌
+Topology	拓扑
+Total	总计
+Total physical	总物理
+Total processes	总进程
+Totals	总计
+Transparent tray icons	透明托盘图标
+Tree	树形
+Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.	键入程序、文件夹、文档或 Internet 资源的名称，Windows 将为您打开它。
+Type:	类型：
+UIAccess:	UIAccess：
+Unknown	未知
+Uptime	运行时间
+URL:	地址：
+Usage	使用
+Use dump storage stack	使用转储存储堆栈
+Use old colors (black background)	使用旧颜色 (黑色背景)
+User account:	用户帐户：
+User name:	用户名称：
+User SID:	用户 SID：
+User time	用户时间
+User time (period)	用户时间 (周期)
+User:	用户名称：
+Utilization:	使用率：
+Value:	值：
+Version:	版本：
+View	视图
+Virtual machine	虚拟机
+Virtual size	虚拟大小
+Virtualization:	虚拟化：
+Virtualized:	虚拟化：
+Window	窗口
+With AVX state context registers	使用 AVX 状态上下文寄存器
+With code segments	带代码段
+With data segments	包含数据段
+With filter triage data	使用筛选器分类数据
+With full auxiliary state	具有完全辅助状态
+With full memory	完整内存
+With full memory info	具有完整内存信息
+With handle data	带句柄数据
+With indirectly referenced memory	使用间接引用的内存
+With Intel processor trace data	使用英特尔处理器跟踪数据
+With module headers	带模块标题
+With private read-write memory	具有专用读写存储器
+With private write-copy memory	使用专用写复制内存
+With process and thread data	使用过程和线程数据
+With thread info	带线程信息
+With token information	使用令牌信息
+With unloaded modules	使用卸载模块
+Without auxiliary state	无辅助状态
+Without optional data	无可选数据
+Working set	工作集
+Write	写入
+Write bytes	写入字节
+Write bytes delta	写入字节
+Write bytes:	写入字节：
+Writes	写入
+Writes delta	写入
+Zeroed	归零
+
+# ============================================================
+# [02] 版本信息 (VERSIONINFO)    6 条
+#   判据: 源码 version.rc 的 VERSIONINFO 块
+# ============================================================
+Copyright (c) Winsider Seminars & Solutions, Inc.  All rights reserved.	版权所有 (c) Winsider Seminars & Solutions 保留所有权利。
+NetworkTools	网络工具
+OnlineChecks	在线检查
+ToolStatus	工具栏状态
+Updater	更新程序
+UserNotes	用户备注
+
+# ============================================================
+# [03] 菜单 (MENU)    201 条
+#   判据: menubar.c/mainwnd.c 的菜单串（含 & 加速键）
+# ============================================================
+&About	关于
+&Above normal	高于正常
+&ACPI Tables	ACPI 表
+&Add	添加
+&Affinity	亲和性
+&Always on top	总在最前
+&Arrived devices	已到达的设备
+&Below normal	低于正常
+&Below normal (2s)	低于正常 (2 秒)
+&Boost	提升
+&Close	关闭
+&Collapse all	全部折叠
+&Combine memory pages	合并内存页
+&Commit charge history	提交用量历史
+&Computer	计算机
+&Connect	连接
+&Continue	继续
+&Copy	复制
+&Create live dump...	创建实时转储...
+&Create service...	创建服务...
+&Critical	关键
+&Custom...	自定义...
+&Decommit	取消提交
+&Delete	删除
+&Deleted services	已删除的服务
+&Detach from debugger	分离调试器
+&Details	详细信息
+&Disable	禁用
+&Disable all	禁用所有
+&Disconnect	断开
+&Disk history	磁盘历史
+&Disk usage (text)	磁盘使用 (文本)
+&Edit	编辑
+&Efficiency	效率模式
+&Empty working set...	清空工作集...
+&Enable	启用
+&Enable all	启用所有
+&Environment variables	环境变量
+&Expand all	全部展开
+&Fast (0.5s)	快 (0.5 秒)
+&File	文件
+&Find handles or DLLs...	查找句柄或 DLL...
+&Free	释放
+&Freeze	冻结
+&Full...	完整...
+&GeoLite database update...	GeoLite 数据库更新...
+&Go to device driver	转到设备驱动程序
+&Go to lower device driver	转到下层设备驱动程序
+&Go to process	转到进程
+&Go to process...	转到进程...
+&Go to processes	转到进程
+&Go to service	转到服务
+&Go to thread...	转到线程...
+&GPU history	GPU 历史
+&GPU memory history	GPU 显存历史
+&GPU memory usage (text)	GPU 显存使用 (文本)
+&GPU temperature (text)	GPU 温度 (文本)
+&GPU temperature history	GPU 温度历史
+&GPU usage (text)	GPU 使用 (文本)
+&Handles	句柄
+&Help	帮助
+&Hibernate	休眠
+&Hide driver services	隐藏驱动程序服务
+&Hide processes from other users	对其他用户隐藏进程
+&Hide waiting connections	隐藏等待中的连接
+&High	高
+&Highest	最高
+&I/O history	I/O 历史
+&I/O priority	I/O 优先级
+&Idle	空闲
+&Inherit	继承
+&Inspect	检查
+&Limited...	受限...
+&Lock	锁定
+&Log	日志
+&Logoff	注销
+&Low	低
+&Lowest	最低
+&Medium	中等
+&Minimal...	最小...
+&Miscellaneous	杂项
+&Modified services	已修改的服务
+&Named Pipes	命名管道
+&Network history	网络历史
+&Network Tools	网络工具
+&Network usage (text)	网络使用 (文本)
+&Normal	正常
+&Normal (1s)	正常 (1 秒)
+&Normal...	正常...
+&NPU history	NPU 历史
+&Object Manager	对象管理器
+&Online Checks	在线检查
+&Opacity	不透明度
+&Opaque	不透明
+&Open file location	打开文件位置
+&Open link	打开链接
+&Options	选项
+&Options...	选项...
+&Pagefiles	页面文件
+&Permissions	权限
+&Physical memory history	物理内存历史
+&Ping	Ping
+&Ping address...	Ping 地址...
+&Priority	优先级
+&Priority class	优先级类别
+&Process monitor	进程监视器
+&Processes	进程
+&Properties	属性
+&Protected	受保护
+&Read/Write memory	读写内存
+&Read/Write memory...	读写内存...
+&Real time	实时
+&Refresh	刷新
+&Registers...	寄存器...
+&Remove	移除
+&Removed devices	已移除的设备
+&Reset	重置
+&Reset sort	重置排序
+&Restore	还原
+&Run as...	运行方式...
+&Run...	运行...
+&Save...	保存...
+&Search thread stacks	搜索线程堆栈
+&Security	安全性
+&Select all	全选
+&Show/Hide System Informer	显示/隐藏 System Informer
+&Sleep	睡眠
+&Slow (5s)	慢 (5 秒)
+&Suspend	挂起
+&System	系统
+&Thaw	解冻
+&Token	令牌
+&Tools	工具
+&Traceroute	路由追踪
+&Traceroute address...	路由追踪地址...
+&Tray icons	托盘图标
+&Trusted Platform Module	受信任的平台模块
+&Unload	卸载
+&Unloaded modules	已卸载的模块
+&User Notes	用户备注
+&Users	用户
+&Very low	很低
+&Very slow (10s)	很慢 (10 秒)
+&View	视图
+&Whois	Whois
+&Whois address...	Whois 地址...
+&Window	窗口
+&Windows	窗口
+&WS watch	工作集监视
+&Zombie processes	僵尸进程
+COM Access Permissions	COM 访问权限
+COM Access Restrictions	COM 访问限制
+COM Launch Permissions	COM 启动权限
+COM Launch Restrictions	COM 启动限制
+Current Power Scheme	当前电源计划
+Current Window Desktop	当前窗口桌面
+Current Window Station	当前窗口站
+Debu&g console	调试控制台
+E&xit	退出
+Enable initialization delay	启用初始化延迟
+Enable persistent layout	启用持久布局
+Enable single click icons	启用单击图标
+Enable transparent icons	启用透明图标
+H&ybrid shut down	混合关机
+Inspect e&xecutable file...	检查可执行文件...
+Log o&ff	注销
+N&otifications	通知
+New &processes	新进程
+New &services	新服务
+P&roperties	属性
+R&estart	重启
+R&estart (Critical)	重启（关键）
+R&estart (Native)	重启（本机）
+Refresh i&nterval	刷新间隔
+Res&tart	重启
+Res&ume	恢复
+Reset persistent layout	重置持久布局
+Restart to advanced options	重启进入高级选项
+Restart to boot options	重启进入启动选项
+Restart to firmware options	重启进入固件选项
+Service Control Manager	服务控制管理器
+Settings	设置
+Show &details for all processes	显示所有进程的详细信息
+Shu&t down	关机
+Shu&t down (Critical)	关机（关键）
+Shu&t down (Native)	关机（本机）
+St&arted services	已启动的服务
+St&opped services	已停止的服务
+Start &Performance Monitor	启动性能监视器
+Start &Resource Monitor	启动资源监视器
+Start &Task Manager	启动任务管理器
+System &information	系统信息
+T&erminate	终止
+T&erminate WSL processes	终止 WSL 进程
+T&erminated processes	已终止的进程
+Terminal Server Listener	终端服务器侦听器
+Update and restart	更新并重启
+Update and shut down	更新并关机
+User list...	用户列表...
+Windows Defender Offline Scan	Windows Defender 脱机扫描
+WMI Root Namespace	WMI 根命名空间
+
+# ============================================================
+# [04] 工具栏与按钮 (TOOLBAR)    17 条
+#   判据: plugins\ToolStatus\toolbar.c 等
+# ============================================================
+Always on top	总在最前
+Computer	计算机
+Customize...	自定义...
+Find handles or DLLs	查找句柄或 DLL
+Find Handles or DLLs	查找句柄或 DLL
+Find window and kill	查找窗口并结束
+Find window and thread	查找窗口和线程
+Lock the toolbar	锁定工具栏
+Main menu (auto-hide)	主菜单（自动隐藏）
+Restart to boot &options	重启进入启动选项
+Search box	搜索框
+Search Network (Ctrl+K)	搜索网络 (Ctrl+K)
+Search Processes (Ctrl+K)	搜索进程 (Ctrl+K)
+Search Services (Ctrl+K)	搜索服务 (Ctrl+K)
+Show details for all processes	显示所有进程的详细信息
+System information	系统信息
+System Information	系统信息
+
+# ============================================================
+# [05] 列表与树 · 列头 (COLUMN)    124 条
+#   判据: PhAddListViewColumn / PhAddTreeNewColumn 的列标题
+# ============================================================
+.NET CLR Exceptions	.NET CLR 异常
+.NET CLR Interop	.NET CLR 互操作
+.NET CLR Jit	.NET CLR JIT
+.NET CLR Loading	.NET CLR 加载
+.NET CLR LocksAndThreads	.NET CLR 锁与线程
+.NET CLR Memory	.NET CLR 内存
+.NET CLR Remoting	.NET CLR 远程处理
+.NET CLR Security	.NET CLR 安全
+Access	访问
+Accessibility	辅助功能
+Action	操作
+Address	地址
+Affinity	亲和性
+Attributes	属性
+Auditing information	审核信息
+Authorization	授权
+Base priority	基本优先级
+Broadcast	广播
+Class	类别
+Command line	命令行
+Comment	备注
+Company Name	公司名称
+Company name	公司名称
+Compartment ID	隔离舱 ID
+Connected	已连接
+Critical	关键
+Default	默认值
+Description	描述
+Desktop information	桌面信息
+Device information	设备信息
+Direction	方向
+Disconnected	已断开
+Display name	显示名称
+Driver	驱动程序
+Driver information	驱动程序信息
+Environment	环境
+Errors	错误
+Event	事件
+File name	文件名
+Filter origin	筛选源
+Flags	标志
+FQBN name	全限定二进制名称
+GDI Handles	GDI 句柄
+Graphics Devices	显示设备
+Groups	组
+Groups (Logon SID)	组（登录 SID）
+Groups (Mandatory label)	组（强制标签）
+High	高
+I/O priority	I/O 优先级
+I/O total rate	I/O 总速率
+Identification	标识
+Images and DLLs	映像和 DLL
+Information	信息
+Interface LUID	接口 LUID
+Local address	本地地址
+Local address class	本地地址类别
+Local address scope	本地地址范围
+Local hostname	本地主机名
+Local port	本地端口
+Local port service	本地端口服务
+Low	低
+LUIDs	LUID
+Mitigation Policies	缓解策略
+Module	模块
+Modules	模块
+Multicast	多播
+N/A	不适用
+Name	名称
+Notifications	通知
+Original name	原始名称
+Owner	所有者
+Package	应用包
+Parent	父级
+Path	路径
+Patterns	模式
+Peak non-paged pool	峰值非分页池
+Peak paged pool	峰值分页池
+Peak working set	峰值工作集
+PID	PID
+Policy app ID	策略应用 ID
+Priority	优先级
+Privileges	特权
+Profile	配置文件
+Protected	受保护
+Protocol	协议
+Read rate	读速率
+Read rate average	读速率平均值
+Remote address	远程地址
+Remote address class	远程地址类别
+Remote address scope	远程地址范围
+Remote hostname	远程主机名
+Remote port	远程端口
+Remote port service	远程端口服务
+Resolving...	正在解析...
+Response time (ms)	响应时间 (毫秒)
+Restricting SIDs	限制 SID
+Rule	规则
+Security information	安全信息
+Service	服务
+Service SIDs	服务 SID
+Session information	会话信息
+Size	大小
+Start time	开始时间
+Start type	启动类型
+State	状态
+System ID	系统 ID
+Timestamp	时间戳
+Total bytes	总字节数
+Total rate	总速率
+Total rate average	总速率平均值
+Tray icons	托盘图标
+TrustLevel	信任级别
+Type	类型
+Type access information	类型访问信息
+Type information	类型信息
+Unicast	单播
+User	用户
+User name	用户名
+Username	用户名
+Value	值
+Version	版本
+Window Station information	窗口站信息
+Write rate	写速率
+Write rate average	写速率平均值
+
+# ============================================================
+# [06] 选项页 (SETTINGS)    56 条
+#   判据: options.c 的设置项与页签
+# ============================================================
+Agent Tools	代理工具
+Agent Tools - Agents	代理工具 - 代理
+Allow only one instance	只允许运行一个实例
+Check images for coherency	检查映像的一致性
+Check images for digital signatures	检查映像的数字签名
+Check services for digital signatures	检查服务的数字签名
+Disk Devices	磁盘设备
+Enable AVX extensions (experimental)	启用 AVX 扩展（实验性）
+Enable column header totals (experimental)	启用列头合计（实验性）
+Enable cycle-based CPU usage	启用基于周期数的 CPU 使用率
+Enable fixed graph scaling (experimental)	启用固定图形缩放（实验性）
+Enable kernel-mode driver	启用内核模式驱动程序
+Enable low-latency mode (experimental)	启用低延迟模式（实验性）
+Enable monospace fonts	启用等宽字体
+Enable new memory strings dialog	启用新的内存字符串对话框
+Enable plugins	启用插件
+Enable process monitor (experimental)	启用进程监视器（实验性）
+Enable start as admin (experimental)	启用以管理员身份启动（实验性）
+Enable streamer mode (disable window capture) (experimental)	启用直播模式（禁用窗口捕获）（实验性）
+Enable tray information window	启用托盘信息窗口
+Enable undecorated symbols	启用未修饰的符号名
+Enable warnings	启用警告
+Enable Windows subsystem for Linux support	启用适用于 Linux 的 Windows 子系统支持
+ExtendedTools	扩展工具
+Fan RPM	风扇转速
+Graphs	曲线图
+Hide default	隐藏默认项
+Hide modified	隐藏已修改项
+Hide when closed	关闭时隐藏
+Hide when minimized	最小化时隐藏
+Highlight default	突出显示默认项
+Highlight modified	突出显示已修改项
+Highlighting	高亮
+Icon click toggles visibility	单击图标切换显示状态
+Include usage of collapsed processes	包含折叠进程的使用量
+Network Devices	网络设备
+No schema description available.	没有可用的架构说明。
+Notifications - Devices	通知 - 设备
+Notifications - Logging	通知 - 日志
+Notifications - Processes	通知 - 进程
+Notifications - Services	通知 - 服务
+Opaque	不透明
+Paste the account id here:	在此粘贴账户 ID：
+Paste the license key here:	在此粘贴许可证密钥：
+Plugins	插件
+RAPL Devices	RAPL 设备
+Remember last selected window	记住上次选择的窗口
+Resolve DNS over HTTPS (DoH)	通过 HTTPS 解析 DNS (DoH)
+Resolve network addresses	解析网络地址
+Show advanced options	显示高级选项
+Show tooltips instantly	立即显示工具提示
+Start hidden	启动时隐藏
+Start when I log on	登录时启动
+Themes	主题
+Tray Icon	系统托盘图标
+View on Github	在 GitHub 上查看
+
+# ============================================================
+# [07] 属性页字段 (PROPERTY)    37 条
+#   判据: *prp.c / 进程·线程·内存属性页
+# ============================================================
+Activity moderation	活动节制
+By type:	按类型：
+Create dump fi&le	创建转储文件
+Create live kernel dump fi&le	创建实时内核转储文件
+Custom...	自定义...
+De&bug	调试
+Efficiency mode	效率模式
+Execution required	需要执行
+Flush heaps	刷新堆
+Freeze	冻结
+FS driver	文件系统驱动
+GDI &handles...	GDI 句柄...
+Heaps...	堆...
+Intermediate level	中间级别
+Listen	侦听
+Locks...	锁...
+Medium +	中 +
+Modified pages...	已修改页面...
+Monitor	监控
+Mutant	突变
+Not allowed	不允许
+Pa&ge priority	页面优先级
+Re&set	重置
+Reduce working &set	缩减工作集
+Resume tree	恢复进程树
+Run &as this user...	以此用户身份运行...
+Runtime Broker	运行时代理
+Semaphore	信号
+Session	会话
+Suspend tree	挂起进程树
+Thaw	解冻
+Timer	定时器
+Total size	总大小
+Undefined	未定义
+Untrusted	不受信任
+Virtuali&zation	虚拟化
+Visible	可见
+
+# ============================================================
+# [08] 插件 (PLUGIN)    155 条
+#   判据: plugins\*（未被上面更具体的 API 判据收走的）
+# ============================================================
+About	关于
+Bitmap read bytes	位图读取字节
+Bitmap reads	位图读取
+Bitmap write bytes	位图写入字节
+Bitmap writes	位图写入
+Bring to front	置于最前
+Bytes per cluster	每簇字节数
+Bytes per file record segment	每个文件记录段字节数
+Bytes per sector	每扇区字节数
+Capabilities	能力
+Clusters per File record segment	每个文件记录段的簇数
+Collapse all	全部折叠
+Config	配置
+Country	国家/地区
+Destroy	销毁
+Device ID	设备 ID
+Devices	设备
+Dialog	对话框
+Disable	禁用
+Disk reads	磁盘读取
+Disk writes	磁盘写入
+Driver Date	驱动程序日期
+Driver Version	驱动程序版本
+Edit Environment Variable	编辑环境变量
+Enable icons	启用图标
+Enumerate message-only windows	枚举仅消息窗口
+Enumerate non-visible windows	枚举不可见窗口
+Enumerate windows	枚举窗口
+Enumerate windows by owner	按所有者枚举窗口
+Enumerate windows by z-order	按 Z 序枚举窗口
+Enumerator	枚举器
+Environment Variables	编辑环境变量
+Exceptions	异常
+Expand all	全部展开
+File read bytes	文件读取字节
+File reads	文件读取
+File trim bytes	文件修剪字节数
+File trim count	文件修剪次数
+File trim time	文件修剪时间
+File write bytes	文件写入字节
+File writes	文件写入
+Find files...	查找文件...
+Firewall	防火墙
+Free clusters	可用簇
+Go to &upper device driver	转到上层设备驱动程序
+Go to process...	转到进程...
+Go to Process...	转到进程...
+Go to service...	转到服务...
+Go to thread...	转到线程...
+Go to Thread...	转到线程...
+GPU Frequency	GPU 频率
+Hide dynamic	隐藏动态的
+Hide native	隐藏本机
+Highlight	突出显示
+Highlight dynamic	突出显示动态的
+Highlight message-only windows	突出显示仅消息窗口
+Highlight native	突出显示本机
+Inspect native image	检查本机映像
+Installed	安装时间
+Job	工作
+LFS version	LFS 版本
+LogFile read bytes	日志文件读取字节
+LogFile reads	日志文件读取
+LogFile write bytes	日志文件写入字节
+LogFile writes	日志文件写入
+Manufacturer	制造商
+Mappings	映射
+Max GPU Frequency	GPU 最大频率
+Maximize	最大化
+Medium	中
+Memory Bandwidth	显存带宽
+Memory Frequency	显存频率
+Message	消息
+Metadata disk reads	元数据磁盘读取
+Metadata disk writes	元数据磁盘写入
+Metadata read bytes	元数据读取字节
+Metadata reads	元数据读取
+Metadata write bytes	元数据写入字节
+Metadata writes	元数据写入
+Mft bitmap read bytes	MFT 位图读取字节
+Mft bitmap reads	MFT 位图读取
+Mft bitmap write bytes	MFT 位图写入字节
+Mft bitmap writes	MFT 位图写入
+MFT mirror start	MFT 镜像起始
+Mft read bytes	MFT 读取字节
+Mft reads	MFT 读取
+MFT records	MFT 记录数
+MFT size	MFT 大小
+MFT start	MFT 起始
+Mft write bytes	MFT 写入字节
+Mft writes	MFT 写入
+MFT Zone clusters	MFT 区域簇数
+MFT zone size	MFT 区域大小
+Minimize	最小化
+Network receives	网络接收
+Network sends	网络发送
+Open &file location	打开文件位置
+Open key	打开注册表项
+Open native file location	打开本机文件位置
+Pagefiles	页面文件
+PCIE Bandwidth	PCIe 带宽
+Physical Location	物理位置
+Power Usage	功耗
+Registry	注册表
+Remove...	移除...
+Reserved clusters	保留簇
+Reserved Memory	保留内存
+Resources exhausted	资源耗尽
+Restart	重启
+Restore	还原
+Results	结果
+Running	正在运行
+Scan with	使用...扫描
+Search driver update	搜索驱动程序更新
+Secu&rity	安全性
+Security	安全性
+Sen&d to	发送到
+Show allocations	显示分配
+Show desktop windows	显示桌面窗口
+Software	软件
+Stopped	已停止
+Strings	字符串
+TCP	TCP
+Temperature	温度
+The following services depend on this service:	以下服务依赖于此服务：
+This service depends on the following services:	此服务依赖于以下服务：
+This service has registered the following PnP devices:	此服务已注册以下 PnP 设备：
+This service type doesn't support PnP devices.	此服务类型不支持 PnP 设备。
+Tools	工具
+Total clusters	总簇数
+Total free	可用总计
+Total Memory	总内存
+Total sectors	总扇区数
+Total used	已用总计
+Traceroute	路由追踪
+UDP	UDP
+Uninstall	卸载
+Use snapshot window finder	使用快照窗口查找器
+User Index read bytes	用户索引读取字节
+User Index reads	用户索引读取
+User Index write bytes	用户索引写入字节
+User Index writes	用户索引写入
+Vendor ID	供应商 ID
+Volume creation time	卷创建时间
+Volume file system	卷文件系统
+Volume partition identifier(s)	卷分区标识符
+Volume serial number	卷序列号
+Volume trim bytes	卷修剪字节数
+Volume trim count	卷修剪次数
+Volume trim skipped bytes	卷修剪跳过字节数
+Volume trim skipped count	卷修剪跳过次数
+Volume trim time	卷修剪时间
+Volume unique identifier	卷唯一标识符
+Volume version	卷版本
+WDDM Version	WDDM 版本
+
+# ============================================================
+# [09] 提示与消息 (MESSAGE)    0 条
+#   判据: PhShowMessage / PhShowError / PhShowWarning
+# ============================================================
+
+# ============================================================
+# [10] 其他代码内字符串 (CODE)    182 条
+#   判据: 有源码出处，但不在上述任何控件上下文里
+# ============================================================
+Active columns...	活动列...
+Analy&ze	分析
+Attach to Process	附加到进程
+Auditing	审计
+Bound	已绑定
+Bring to &front	置于最前
+C&lose	关闭
+CFG bitmap	配置位图
+CFG bitmap...	CFG 位图...
+Change &protection...	更改保护...
+Choose Columns	选择列
+Close wait	关闭等待
+Containers	容器
+Contains (case-insensitive)...	包含（不区分大小写）...
+Contains...	包含...
+Copy source &link	复制源链接
+Create Service	创建服务
+Cut	剪切
+Delete TCB	删除 TCB
+Disabled Plugins	禁用的插件
+Empty &all	全部清空
+Empty &compression cache	清空压缩缓存
+Empty &modified file cache	清空已修改文件缓存
+Empty &modified page list	清空已修改页面列表
+Empty &priority 0 standby list	清空优先级 0 待机列表
+Empty &registry cache	清空注册表缓存
+Empty &standby list	清空待机列表
+Empty &working sets	清空工作集
+Empty system &file cache	清空系统文件缓存
+Enter	Enter
+Established	已建立
+Event Pair	事件对
+Extended character set	扩展字符集
+File propert&ies	文件属性
+FIN wait 1	FIN 等待 1
+FIN wait 2	FIN 等待 2
+Go to &process...	转到进程...
+Go to service	转到服务
+Handle snapshots	句柄快照
+Handle Statistics	句柄统计
+Heaps	堆
+Help	帮助
+Hide &system processes	隐藏系统进程
+Hide cmd	隐藏 cmd
+Hide column	隐藏列
+Hide default namespace	隐藏默认命名空间
+Hide default services	隐藏默认服务
+Hide etw handles	隐藏 ETW 句柄
+Hide free pages	隐藏可用页
+Hide guard pages	隐藏保护页
+Hide gui	隐藏 GUI 线程
+Hide inherit handles	隐藏继承的句柄
+Hide inline frames	隐藏内联帧
+Hide knowndlls images	隐藏 KnownDLL 映像
+Hide low image coherency	隐藏映像一致性低的
+Hide mapped	隐藏已映射的
+Hide process	隐藏进程
+Hide protected handles	隐藏受保护的句柄
+Hide reserved pages	隐藏保留页
+Hide si&gned processes	隐藏已签名进程
+Hide static	隐藏静态的
+Hide suspended	隐藏已挂起的
+Hide system	隐藏系统
+Hide system frames	隐藏系统帧
+Hide unnamed handles	隐藏未命名的句柄
+Hide user	隐藏用户
+Hide user frames	隐藏用户帧
+Hide verified	隐藏已验证的
+Highlight .NET modules	突出显示 .NET 模块
+Highlight alert by thread ID	按线程 ID 突出显示警报
+Highlight CFG pages	突出显示 CFG 页
+Highlight cmd	突出显示 cmd
+Highlight default namespace	突出显示默认命名空间
+Highlight delay execution	突出显示延迟执行
+Highlight executable pages	突出显示可执行页
+Highlight executive	突出显示执行体
+Highlight gui	突出显示 GUI 线程
+Highlight immersive modules	突出显示沉浸式模块
+Highlight inherit handles	突出显示继承的句柄
+Highlight inline frames	突出显示内联帧
+Highlight knowndlls images	突出显示 KnownDLL 映像
+Highlight low image coherency	突出显示映像一致性低的
+Highlight mapped modules	突出显示已映射的模块
+Highlight native modules	突出显示本机模块
+Highlight private pages	突出显示私有页
+Highlight process	突出显示进程
+Highlight protected handles	突出显示受保护的句柄
+Highlight queue	突出显示队列
+Highlight relocated modules	突出显示已重定位的模块
+Highlight suspended	突出显示已挂起的
+Highlight system	突出显示系统
+Highlight system frames	突出显示系统帧
+Highlight system modules	突出显示系统模块
+Highlight system pages	突出显示系统页
+Highlight untrusted modules	突出显示不受信任的模块
+Highlight user	突出显示用户
+Highlight user frames	突出显示用户帧
+Highlight user request	突出显示用户请求
+Inactive columns...	非活动列...
+Interrupts and DPCs	中断与 DPC
+Last ack	最后确认
+Live kernel dump	实时内核转储
+Loa&d column set	加载列集
+Load module...	加载模块...
+Log	日志
+M&aximize	最大化
+M&inimize	最小化
+Match Case	区分大小写
+Memory Lists	内存列表
+Memory Protection	内存保护
+Minimum length...	最小长度...
+Modified pages	修改后的页面
+Modified...	已修改...
+Network Stack	网络堆栈
+New variable...	新建变量...
+No-Execute-Up	禁止向上执行
+No-Read-Up	禁止向上读取
+No-Write-Up	禁止向上写入
+Open &key	打开注册表项
+Open &source link	打开源链接
+Organi&ze column sets...	管理列集...
+Organize Column Sets	组织列集
+Own interactive process	独立交互进程
+Own process	独立进程
+Paste	粘贴
+Per&missions	权限
+Performance	性能
+Plugin Properties	插件属性
+Process dump	进程转储
+Process Monitor	进程监控
+Process Record	进程记录
+Prope&rties	属性
+Read/Write &address...	读取/写入地址...
+Read/Write memory	读写内存
+Regex (case-insensitive)...	正则表达式（不区分大小写）...
+Regex...	正则表达式...
+Rem&ote control	远程控制
+Remote Control	远程控制
+Reset sort	重置排序
+Restart to boot application	重启进入启动应用程序
+Restart to firmware application	重启进入固件应用程序
+Run As	运行方式
+Run Container	运行容器
+S&tatistics	统计信息
+Sa&ve column set...	保存列集...
+Scrol&l to new processes	滚动到新进程
+Scroll Here	滚动至此
+Secure System	安全系统
+Select a package	选择软件包
+Select a Process	选择一个进程
+Select All	全选
+Send &message...	发送消息...
+Session Properties	会话属性
+Share process	共享进程
+Show all-valid (no CFG) ranges	显示全部有效（无 CFG）范围
+Show CPU &below 0.01	显示 CPU 低于 0.01
+Show image CFG targets	显示映像 CFG 目标
+Show modified/allowed targets	显示已修改/允许的目标
+Size all columns to fit	所有列宽自适应
+Size column to fit	列宽自适应
+Socket	套接字
+Sort &child processes	对子进程排序
+Sort &root processes	对根进程排序
+String Search	字符串搜索
+Strings...	字符串...
+Symbols	符号
+SYN received	SYN 接收
+SYN sent	SYN 发送
+System Idle Process	系统空闲进程
+Thread Context	线程上下文
+Thread Stack	线程堆栈
+Thread Stack Scan	线程堆栈扫描
+Thread Stacks	线程堆栈
+Time &critical	时间关键
+Time wait	时间等待
+Un&load	卸载
+Undo	撤销
+User share process	用户共享进程
+User share process (instance)	用户共享进程（实例）
+Users List	用户列表
+Zero pad addresses	地址补零
+Zombie Processes	隐藏进程
+
+# ============================================================
+# [11] 外部数据与系统名称 (EXTERNAL)    52 条
+#   判据: 源码里搜不到：Windows 进程名/描述、外部数据、人工补的条目
+# ============================================================
+<a href="https://systeminformer.sourceforge.io">System Informer on SourceForge.net</a>	<a href="https://systeminformer.sourceforge.io">SourceForge.net 上的 System Informer</a>
+Antimalware Service Executable	反恶意软件服务可执行文件
+Application Frame Host	应用框架主机
+Auto start (trigger)	自动启动（触发器）
+Boot start (trigger)	引导启动（触发器）
+Client Server Runtime Process	客户端服务器运行时进程
+COM Surrogate	COM 代理
+Commit size	提交大小
+Copy &Full Name	复制完整名称
+Copy Object &Address	复制对象地址
+Ctrl+C	Ctrl+C
+Ctrl+Enter	Ctrl+Enter
+Ctrl+M	Ctrl+M
+Del	Del
+Demand start (trigger)	按需启动（触发器）
+Desktop Window Manager	桌面窗口管理器
+DiskDrive	磁盘驱动器
+Generic Host Process for Win32 Services	Win32 服务的通用主机进程
+Host Process for Windows Services	Windows 服务的主机进程
+Host Process for Windows Tasks	Windows 任务的主机进程
+I/O rate	I/O 速率
+Local Security Authority Process	本地安全机构进程
+Memory Compression	内存压缩
+Microsoft IME	微软输入法
+Microsoft Windows Search Indexer	Microsoft Windows 搜索索引器
+NT Kernel & System	NT 内核与系统
+Print Spooler	打印后台处理程序
+Process Isolation	进程隔离
+Refresh a&utomatically	自动刷新
+Run &as...	以其他用户身份运行...
+Run as &package...	以应用包身份运行...
+Search &online	在线搜索
+Search Devices (Ctrl+K)	搜索设备 (Ctrl+K)
+Search Disk (Ctrl+K)	搜索磁盘 (Ctrl+K)
+Search Firewall (Ctrl+K)	搜索防火墙 (Ctrl+K)
+Shell Infrastructure Host	Shell 基础结构主机
+Shift+Del	Shift+Del
+System Informer dynamic data is an invalid length.	System Informer 动态数据的长度无效。
+System Informer dynamic data is not yet supported on this kernel version.	System Informer 动态数据不支持此内核版本。
+System Informer dynamic data signature is invalid.	System Informer 动态数据的签名无效。
+System Informer dynamic data version is incompatible.	System Informer 动态数据的版本不兼容。
+System Informer kernel library version is incompatible.	System Informer 内核库的版本不兼容。
+System start (trigger)	系统启动（触发器）
+Task Host Window	任务宿主窗口
+Terminate tree	终止进程树
+Users	用户
+Windows Audio Device Graph Isolation	Windows 音频设备图形隔离
+Windows Defender SmartScreen	Windows Defender 智能屏幕
+Windows Logon Application	Windows 登录应用程序
+Windows Security Health Service	Windows 安全健康服务
+Windows Shell Experience Host	Windows Shell 体验主机
+WMI Provider Host	WMI 提供程序主机
+
+# ============================================================
+# [12] 运行时未命中（自动收集·待翻译）    0 条
+#   来源: E:\汉化文件\System Informer\SystemInformer-Zh\dist\zh_dict.missed.txt
+#   这些是程序运行时「界面上出现过、但词典里没有」的串，由 zh_hook.dll
+#   自动收集（每条只记一次，跨次运行不重复）。译文留空 —— 加载器对空译文
+#   的条目直接跳过，所以留着不影响运行。
+#   数值类（内存占用、CPU 百分比、PID、DOMAIN\user）在收集端和合并端
+#   各滤了一遍，所以这里只有看着像界面文字的；再改判据要两边同时改。
+#
+#   ★ 下面按【来源】分组。来源是运行期采集的指纹：控件链 + 列表列头 +
+#     所在列。进程列表 / 服务列表 / 设备列表的控件类都是 PhTreeNew、
+#     控件 ID 都是 0、父链也一样，**只有列头能区分** —— 所以能分出
+#     「这是服务列表的名称列」还是「这是某个对话框上的文字」。
+#
+#   补法：把译文填到 TAB 右边即可；填好之后这一条就生效了。
+#   想让它归类归位，可把该行挪进上面对应分区（organize.py 重跑会按原文归位）。
+# ============================================================
+
+# ============================================================
+# [13] 数据行内容（按来源·勿译）    0 条
+#   这些**不要翻译**，留在这里是为了留证据、也为了让你能一眼看清
+#   「哪些东西是列表里的数据」。它们和 [12] 的差别不是猜的：
+#   运行期采集的指纹证明它们画在列表的数据列上（例如「服务列表的
+#   名称列」「设备列表的制造商列」），而不是某个对话框上的界面文字。
+#
+#   注：译文一律留空。加载器对空译文直接跳过，所以这些条目对运行
+#   没有任何影响；就算某天真要翻其中一个，把译文填上即可生效。
+#   想彻底不要，可以删掉整个 [13] 区 —— 下次运行还会重新采集到。
+# ============================================================

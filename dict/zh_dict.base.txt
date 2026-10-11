@@ -1,0 +1,152 @@
+# System Informer 中文词典
+# 格式: 原文<TAB>译文      以 # 开头为注释
+#
+# 编码必须是 UTF-8（无 BOM），加载器用 MultiByteToWideChar(CP_UTF8)。
+# 只在「整串精确相等」时替换，所以短词误伤面有限。
+#
+# ---- 工具栏 (plugins/ToolStatus/toolbar.c ToolbarGetText) ----
+Refresh	刷新
+Options	选项
+Find handles or DLLs	查找句柄或 DLL
+System information	系统信息
+Find window	查找窗口
+Find window and thread	查找窗口和线程
+Find window and kill	查找窗口并结束
+Always on top	总在最前
+Computer	计算机
+Show details for all processes	显示所有进程的详细信息
+#
+# ---- 主界面列标题 (PhAddListViewColumn / 进程列表表头) ----
+Name	名称
+PID	PID
+CPU	CPU
+User name	用户名
+Type	类型
+Value	值
+Status	状态
+Description	描述
+Company Name	公司名称
+Company name	公司名称
+Version	版本
+Start time	开始时间
+Private bytes	私有字节
+Working set	工作集
+Peak working set	峰值工作集
+Virtual size	虚拟大小
+Paged pool	分页池
+Non-paged pool	非分页池
+Peak paged pool	峰值分页池
+Peak non-paged pool	峰值非分页池
+Page faults	页面错误
+Commit size	提交大小
+Base priority	基本优先级
+Threads	线程
+Handles	句柄
+Priority	优先级
+File name	文件名
+Path	路径
+Address	地址
+Size	大小
+Modified	修改时间
+Session	会话
+Integrity	完整性
+Comment	备注
+Command line	命令行
+User	用户
+Process	进程
+Module	模块
+I/O total rate	I/O 总速率
+I/O priority	I/O 优先级
+I/O rate	I/O 速率
+DiskDrive	磁盘驱动器
+FS driver	文件系统驱动
+Display name	显示名称
+Local address	本地地址
+Local port	本地端口
+Local hostname	本地主机名
+Filter origin	筛选源
+Manufacturer	制造商
+#
+# ---- 主界面标签栏 (自研控件 PhTabNew, phlib/tabnew.c) ----
+# Disk / Firewall / Devices 不在主程序 exe 里，来自插件 DLL
+Processes	进程
+Services	服务
+Network	网络
+Disk	磁盘
+Firewall	防火墙
+Devices	设备
+#
+# ---- 菜单栏 (自绘 menubar.c) ----
+# 实测：menubar 把「带 & 的原始串」直接交给 DrawTextExW（日志实录
+#   [HIT] DrawTextExW "&View" -> ... ），说明它靠绘制标志隐藏 &、而不是先剥掉。
+# 所以译文里绝不能再带 "(&V)" 这种后缀 —— 那会被原样画出来。译成纯中文即可。
+System	系统
+&System	系统
+View	视图
+&View	视图
+Tools	工具
+&Tools	工具
+Users	用户
+&Users	用户
+Help	帮助
+&Help	帮助
+File	文件
+&File	文件
+Edit	编辑
+&Edit	编辑
+Window	窗口
+&Window	窗口
+Options	选项
+&Options	选项
+#
+# ---- 进程描述列 (FileDescription) ----
+# 重要前提（日志实测，别想当然）：中文 Windows 上，exe 自带的 FileDescription
+# 已经是微软本地化好的中文 —— "Windows 会话管理器" / "Windows 资源管理器" /
+# "控制台窗口主机" / "服务和控制器应用" / "设置" 这些在我们钩子里是 [miss]，
+# 但它们本来就是中文，与词典无关。
+# 所以这里只收「在本系统上确实显示为英文」的两类：
+#   ① System Informer 对伪进程的硬编码串（System Idle / Interrupts / Registry）
+#   ② 只带英文版本资源的应用程序
+# 刻意不收：第三方软件名与品牌（IDM、Catsxp Browser、TortoiseGit、TIM…）；
+#           进程名/驱动名/服务名（smss.exe、AMD PCI…）—— 保留英文更利于排查。
+System Idle Process	系统空闲进程
+NT Kernel & System	NT 内核与系统
+Registry	注册表
+Memory Compression	内存压缩
+Interrupts	中断
+Interrupts and DPCs	中断与 DPC
+Client Server Runtime Process	客户端服务器运行时进程
+Secure System	安全系统
+WMI Provider Host	WMI 提供程序主机
+Microsoft IME	微软输入法
+Application Frame Host	应用框架主机
+Windows Shell Experience Host	Windows Shell 体验主机
+Runtime Broker	运行时代理
+COM Surrogate	COM 代理
+Windows Logon Application	Windows 登录应用程序
+Local Security Authority Process	本地安全机构进程
+Task Host Window	任务宿主窗口
+Desktop Window Manager	桌面窗口管理器
+Windows Audio Device Graph Isolation	Windows 音频设备图形隔离
+Generic Host Process for Win32 Services	Win32 服务的通用主机进程
+Microsoft Windows Search Indexer	Microsoft Windows 搜索索引器
+Print Spooler	打印后台处理程序
+Antimalware Service Executable	反恶意软件服务可执行文件
+Host Process for Windows Tasks	Windows 任务的主机进程
+Host Process for Windows Services	Windows 服务的主机进程
+Windows Security Health Service	Windows 安全健康服务
+Shell Infrastructure Host	Shell 基础结构主机
+Windows Defender SmartScreen	Windows Defender 智能屏幕
+Search Processes (Ctrl+K)	搜索进程 (Ctrl+K)
+#
+# ---- 通用按钮 / 对话框 ----
+OK	确定
+Cancel	取消
+Apply	应用
+Close	关闭
+&Close	关闭
+Copy	复制
+&Copy	复制
+Properties	属性
+&Properties	属性
+&Refresh	刷新

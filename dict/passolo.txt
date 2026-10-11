@@ -1,0 +1,683 @@
+General	一般
+Permissions	权限
+Terminate	终止
+File	文件
+<a>Company name link</a>	<a>公司名称链接</a>
+Version:	版本：
+Image file name (Win32):	映像文件名称：
+Inspect	检查
+Open	打开
+Process	进程
+Command line:	命令行：
+Current directory:	当前目录：
+Started:	开始：
+Parent console:	PEB 地址：
+Parent process:	父：
+View	查看
+Mitigation policies:	缓解策略：
+Details	详细信息
+Protection:	保护：
+Image type:	映像文件类型：
+View	查看
+Image file name:	映像文件名称：
+Inspect	检查
+Open	打开
+Policy	策略
+Modules	模块
+Options	选项(&O)
+Threads	线程
+Options	选项(&O)
+Handles	句柄
+Options	选项(&O)
+Environment	环境
+Refresh	刷新(&R)
+Options	选项(&O)
+Thread Stack	线程堆栈
+Copy	复制(&C)
+Refresh	刷新(&R)
+Close	关闭(&X)
+Options	选项(&O)
+Thread Stacks	线程堆栈
+Refresh	刷新(&R)
+Users List	用户列表
+Refresh	刷新(&R)
+About	关于
+Copyright (c) Winsider Seminars && Solutions, Inc.	版权所有 (c) Winsider Seminars && Solutions, Inc.
+Credits.	名单。
+<a href="https://systeminformer.sourceforge.io">System Informer on SourceForge.net</a>	<a href="http：//processhacker.sourceforge.net">Process Hacker 在 SourceForge.net</a>
+Diagnostics	诊断(&D)
+OK	确定(&O)
+&Start	开始(&S)
+&Pause	暂停(&P)
+General	一般
+Type:	类型：
+Start type:	启动类型：
+Error control:	错误控制：
+Group:	组：
+Binary path:	二进制路径：
+Browse...	浏览...
+User account:	用户帐户：
+Password:	密码：
+Service DLL:	服务 DLL：
+Delayed start	延迟启动(&D)
+Permissions	权限(&P)
+General	一般
+Information	信息(&I)
+Save...	保存(&S)...
+Copy	复制(&C)
+Close	关闭(&X)
+Find Handles or DLLs	查找句柄或 DLL
+Find	查找(&F)
+Token	令牌
+User:	用户名称：
+User SID:	用户 SID：
+Session:	会话 ID：
+Unknown	未知
+Elevated:	提升：
+Unknown	未知
+Virtualized:	虚拟化：
+Unknown	未知
+Integrity	完整性(&I)
+Advanced	高级(&A)
+Permissions	权限(&P)
+Default token	默认令牌(&T)
+Zombie Processes	隐藏进程
+Processes highlighted red are hidden while those highlighted grey have terminated.	高亮红色为隐藏的进程， 高亮灰色为已终止的进程。
+Terminate	终止(&T)
+Save...	保存(&S)...
+&Scan	扫描(&C)
+Close	关闭(&X)
+Run As	运行方式
+Enter the command to start as the specified user.	输入命令以指定的用户身份启动。
+Program:	程序：
+User name:	用户名称：
+Type:	类型：
+Password:	密码：
+Toggle elevation	切换高程(&T)
+Session ID:	会话 ID：
+Desktop:	桌面：
+OK	确定(&O)
+Cancel	取消(&C)
+Browse	浏览(&B)...
+Create suspended	创建挂起(&S)
+Create UIAccess	创建 &UIAccess
+Progress	进度
+Cancel	取消(&C)
+Please wait...	请稍候...
+Pagefiles	页面文件
+Refresh	刷新(&R)
+Close	关闭(&X)
+General	常规
+Token	令牌
+User:	用户名称：
+User SID:	用户 SID：
+Owner:	所有者：
+Primary group:	初始组：
+Session ID:	会话 ID：
+Elevated:	提升：
+Virtualization:	虚拟化：
+UIAccess:	UIAccess：
+Linked token	链接令牌(&T)
+Source	来源
+Name:	名称：
+LUID:	LUID：
+Advanced	高级
+Job	工作
+Name:	名称：
+Terminate	终止(&T)
+Processes in job:	工作进程：
+Add...	添加(&A)...
+Limits:	限制：
+Advanced	高级(&D)
+Event	事件
+Type:	类型：
+Unknown	未知
+Signaled:	信号：
+Unknown	未知
+Set	设置(&S)
+Reset	重置(&R)
+Pulse	脉冲(&P)
+Mutant	突变
+Count:	计数：
+Unknown	未知
+Abandoned:	抛弃：
+Unknown	未知
+Owner:	所有者：
+Unknown	未知
+Semaphore	信号
+Current count:	当前计数：
+Unknown	未知
+Maximum count:	最大计数：
+Unknown	未知
+Acquire	获取(&A)
+Release	释放(&R)
+Timer	定时器
+Signaled:	信号：
+Unknown	未知
+Cancel	取消(&C)
+Statistics	统计
+General	一般
+Active processes	活动进程
+Total processes	总进程
+Terminated due to job limits	终止进程
+Time	时间
+User time	用户时间
+Kernel time	内核时间
+User time (period)	用户时间 (周期)
+Kernel time (period)	内核时间 (周期)
+Memory	内存
+Page faults	页面错误
+Peak process usage	进程使用峰值
+Peak job usage	工作使用峰值
+Reads	读取
+Read bytes	读取字节
+Writes	写入
+Write bytes	写入字节
+Other	其它
+Other bytes	其它字节
+Event Pair	事件对
+Set low	设置低(&L)
+Set high	设置高(&H)
+Affinity	亲和性
+OK	确定(&O)
+Cancel	取消(&C)
+Affinity controls which CPUs threads are allowed to execute on.	亲和性控制允许线程上执行的 CPU。
+Select all	全选(&A)
+Deselect all	取消全选(&U)
+System Information	系统信息
+Permissions	权限
+Add	添加
+Advanced	高级
+Remove	移除
+View	查看
+Message	消息
+Title:	标题：
+Text:	文本：
+Icon:	图标：
+Timeout (s):	超时 (秒)：
+OK	确定(&O)
+Cancel	取消(&C)
+Session Properties	会话属性
+Close	关闭(&X)
+Memory	内存
+Refresh	刷新(&R)
+Options	选项(&O)
+Dialog	对话框
+Text:	文本：
+Option	选项(&O)
+OK	确定(&O)
+Cancel	取消(&C)
+General	常规
+Search engine:	搜索引擎：
+PE viewer:	PE 查看器：
+Max. size unit:	最大大小单位：
+Icon processes:	图标进程：
+Font...	字体(&F)...
+Monospace...	等宽字体(&M)...
+Make default...	设为默认(&D)...
+Graph history length:	图表历史记录长度：
+Automatic	自动(&A)
+Application font:	应用字体：
+System Informer is the default Task Manager:	System Informer 作为默认任务管理器：
+Symbol path:	符号路径：
+Highlighting	高亮
+Highlighting duration:	高亮持续时间：
+New objects:	新对象：
+New objects	新对象
+Removed objects:	移除对象：
+Removed objects	移除对象
+Double-click an item to change it.	双击某个项目即可对其进行更改。
+Enable all	启用所有(&E)
+Disable all	禁用所有(&D)
+Themes	主题
+Enable theme support (experimental)	启用主题支持（实验性）
+Theme mode:	主题模式：
+Tray Icon	系统托盘图标
+Lazy start	延迟启动
+Single-click tray icons	单击托盘图标
+Persist tray icon layout	保留托盘图标布局
+Transparent tray icons	透明托盘图标
+Reset layout	重置布局
+Choose Columns	选择列
+Inactive columns:	待用列：
+Show >	显示(&D)>
+< Hide	<隐藏(&H)
+Move up	上移(&U)
+Move down	下移(&D)
+OK	确定(&O)
+Cancel	取消(&C)
+Active columns:	活动列：
+Select the columns that will appear in the list.	选择要在列表中显示的列。
+Network Stack	网络堆栈
+Close	关闭(&X)
+Create Service	创建服务
+Name:	名称：
+Display name:	显示名称：
+Type:	类型：
+Start type:	启动类型：
+Error control:	错误控制：
+Binary path:	二进制路径：
+Browse...	浏览(&B)...
+OK	确定(&O)
+Cancel	取消(&C)
+Performance	性能
+CPU	处理器
+Private bytes	专用字节
+Statistics	统计
+Advanced	高级
+Options	选项(&O)
+Refresh	刷新(&R)
+GDI Handles	GDI 句柄
+Refresh	刷新(&R)
+Close	关闭(&X)
+Log	日志
+Clear	清除(&L)
+Auto-scroll	自动滚动(&A)
+Save...	保存(&S)...
+Copy	复制(&C)
+Close	关闭(&X)
+Memory	内存
+Re-read	重读(&R)
+Write	写入(&W)
+Go to...	转到(&G)...
+Save...	保存(&S)...
+Close	关闭(&X)
+Memory Protection	内存保护
+New value:	新值：
+OK	确定(&O)
+Cancel	取消(&C)
+Results	结果
+Results.	结果。
+Filter	过滤器(&F)
+Save...	保存(&S)...
+Copy	复制(&C)
+Close	关闭(&X)
+String Search	字符串搜索
+Minimum length:	最小长度：
+Detect Unicode	检测 &Unicode
+Search in the following types of memory regions:	在以下类型的内存区域中搜索:
+Private	私有的(&P)
+Image	映像(&I)
+Mapped	映射(&M)
+OK	确定(&O)
+Cancel	取消(&C)
+Extended Unicode	扩展的 U&nicode
+Graphs	曲线图
+Show text	显示文字(&T)
+Use old colors (black background)	使用旧颜色 (黑色背景)(&C)
+Show commit charge instead of physical memory in summary view	在摘要视图中显示提交用量而不是物理内存(&I)
+Plugins	插件
+Changes may require a restart to take effect.	更改需要重新启动后才能生效。
+Disabled plugins (0)	禁用的插件 (0)
+Handle Statistics	句柄统计
+Close	关闭(&X)
+Process Record	进程记录
+Name:	名称：
+Parent:	父：
+File	文件
+Version:	版本：
+Image file name:	映像文件名称：
+Open	打开
+Command line:	命令行：
+Started:	开始：
+Terminated:	终止：
+Session ID:	会话 ID：
+Properties	属性(&P)
+Close	关闭(&X)
+Select a Process	选择一个进程
+Select a process from the list below.	从下面的列表中选择一个进程：
+Refresh	刷新(&R)
+OK	确定(&O)
+Cancel	取消(&C)
+Services	服务
+Services	服务
+Remote Control	远程控制
+To end the remote control session, press this key and the modifiers selected below:	若要结束远程控制会话，请按此键和下面选择的修饰符：
+Shift	&Shift
+Ctrl	&Ctrl
+Alt	&Alt
+OK	确定(&O)
+Cancel	取消(&C)
+Capabilities	能力
+Attributes	属性
+CPU name	CPU 名称
+Panel layout	面板布局
+Graph layout	图形布局
+Utilization:	使用率：
+Speed:	速度：
+Virtualization:	虚拟化：
+System	系统
+Processes	进程
+Threads	线程
+Handles	句柄
+Uptime	运行时间
+&Show one graph per CPU	显示每个 &CPU 图形
+Context switches delta	上下文切换
+Interrupts delta	中断
+DPCs delta	DPC
+System calls delta	系统调用
+Topology	拓扑
+Cores	核心
+Sockets	插槽
+Logical processors	逻辑处理器
+Latency	延迟
+Hardware	硬件
+L1 cache	L1 缓存
+L2 cache	L2 缓存
+L3 cache	L3 缓存
+Commit charge	提交用量
+Current	当前
+Peak	峰值
+Limit	限制
+Physical memory	物理内存
+Current	当前
+Cache WS	缓存 WS
+Total	总计
+Kernel WS	内核 WS
+Driver WS	驱动 WS
+Paged pool	分页池
+Working set	工作集
+Limit	限制
+Virtual size	虚拟大小
+Allocs delta	分配
+Frees delta	释放
+Non-paged pool	非分页池
+Usage	使用
+Allocs delta	分配
+Limit	限制
+Frees delta	释放
+Memory lists	内存列表
+Zeroed	归零
+Modified	修改
+Free	可用
+Modified no-write	修改不写
+Standby	备用
+Priority 0	优先级 0
+Priority 1	优先级 1
+Priority 2	优先级 2
+Priority 3	优先级 3
+Priority 4	优先级 4
+Priority 5	优先级 5
+Priority 6	优先级 6
+Priority 7	优先级 7
+Paging	分页
+Page faults delta	页面错误
+Pagefile writes delta	页面文件写入
+Page reads delta	页面读取
+Mapped writes delta	映射写入
+Modified pagefile	修改页面文件
+&More	更多(&M)
+Reserved	保留
+Mapped IO	映射的 IO
+Mapped reads	映射读取
+Mapped writes	映射写入
+&Empty	空(&E)
+Hardware	硬件
+Slots used	使用的插槽
+Form factor	外形规格
+Technology	技术
+Memory type	内存类型
+Speed	速度
+Memory	内存
+Memory	内存
+Panel layout	面板布局
+Graph layout	图形布局
+Total physical	总物理
+Commit charge:	提交用量：
+Physical memory:	物理内存：
+Panel layout	面板布局
+Graph layout	图形布局
+Read bytes:	读取字节：
+Write bytes:	写入字节：
+Other bytes:	其他字节：
+I/O deltas	I/O 详情
+Reads delta	读取
+Read bytes delta	读取字节
+Writes delta	写入
+Write bytes delta	写入字节
+Other delta	其它
+Other bytes delta	其它字节
+I/O totals	I/O 总数
+Reads	读取
+Read bytes	读取字节
+Writes	写入
+Write bytes	写入字节
+Other	其它
+Other bytes	其它字节
+Memory Lists	内存列表
+Close	关闭(&X)
+Zeroed	归零
+Free	可用
+Modified	修改
+Modified no-write	不保存修改
+Bad	坏
+Standby	备用
+Priority 0	优先级 0
+Priority 1	优先级 1
+Priority 2	优先级 2
+Priority 3	优先级 3
+Priority 4	优先级 4
+Priority 5	优先级 5
+Priority 6	优先级 6
+Priority 7	优先级 7
+(Repurposed)	(改变用途)
+&Empty	空(&E)
+Modified pagefile	修改页面文件
+Content layout	内容布局
+Section	节
+Options	选项
+Pin	停靠
+CPU	处理器
+Mitigation Policies	缓解策略
+Description:	说明：
+OK	确定
+Policy	策略
+Edit Environment Variable	编辑环境变量
+OK	确定
+Cancel	取消
+Options	选项
+Close	关闭(&X)
+Reset	重置(&R)
+Apply	应用(&A)
+Cleanup	清理(&C)
+Plugin Properties	插件属性
+Plugin	插入
+Name:	姓名：
+Internal name:	内部名称：
+Author:	作者：
+URL:	地址：
+<a>Open</a>	<a>打开</a>
+File name:	文件名：
+Version:	版本：
+Description:	描述：
+Options...	选项(&O)...
+Close	关闭(&X)
+Disabled Plugins	禁用的插件
+OK	确定
+Changes may require a restart to take effect.	更改可能需要重新启动才能生效。
+Refresh	刷新(&R)
+Options	选项(&O)
+Organize Column Sets	组织列集
+Move up	上移(&U)
+Move down	下移(&D)
+OK	确定
+Rename	重命名(&R)
+Delete	删除(&D)
+Run	运行
+Type the name of a program, folder, document, or Internet resource, and Windows will open it for you.	键入程序、文件夹、文档或 Internet 资源的名称，Windows 将为您打开它。
+&Open:	打开(&O)：
+OK	确定
+Cancel	取消(&C)
+&Browse...	浏览(&B)...
+Create this task with TrustedInstaller privileges.	使用 &TrustedInstaller 权限创建此任务。
+Create this task with Administrative privileges.	使用管理权限创建此任务(&A)。
+Live kernel dump	实时内核转储
+Use dump storage stack	使用转储存储堆栈(&A)
+Compress memory pages	压缩内存页(&B)
+Capture user pages	捕获用户页面(&C)
+Capture Hypervisor pages	捕获虚拟机管理程序页面(&D)
+Include nonessential Hypervisor pages	包括不必要的虚拟机管理程序页面(&E)
+Only kernel thread stacks	仅内核线程堆栈(&F)
+Save	确定(&O)
+Cancel	取消(&C)
+Heaps	堆
+Close	关闭(&X)
+Sizes in bytes	字节大小(&S)
+Refresh	刷新(&R)
+Process dump	进程转储
+Normal	正常
+With data segments	使用数据细分
+With full memory	内存满
+With handle data	带句柄数据
+Filter memory	筛选内存
+Scan memory	扫描内存
+With unloaded modules	使用卸载模块
+With indirectly referenced memory	使用间接引用的内存
+Filter module paths	筛选模块路径
+With process and thread data	使用过程和线程数据
+With private read-write memory	具有专用读写存储器
+Without optional data	无可选数据
+With full memory info	具有完整内存信息
+With thread info	带线程信息
+With code segments	带代码段
+Without auxiliary state	无辅助状态
+With full auxiliary state	具有完全辅助状态
+With private write-copy memory	使用专用写复制内存
+Ignore inaccessible memory	忽略无法访问的内存
+With token information	使用令牌信息
+With module headers	带模块标题
+With filter triage data	使用筛选器分类数据
+With AVX state context registers	使用 AVX 状态上下文寄存器
+With Intel processor trace data	使用英特尔处理器跟踪数据
+Scan inaccessible partial pages	扫描无法访问的部分页面
+Filter write-combined memory	筛选写入组合内存
+Save	确定(&O)
+Cancel	取消(&C)
+Mappings	映射
+Select a package	选择软件包
+Select the identity for access to the package file system and registry.	选择用于访问包文件系统和注册表的标识。
+Refresh	刷新(&R)
+OK	确定
+Cancel	取消(&C)
+Enter the command to start as the specified package.	输入命令以启动指定包。
+Browse	浏览(&B)...
+Modified pages	修改后的页面
+Refresh	刷新(&R)
+Close	关闭(&X)
+Status	状态
+Thread Stack Scan	线程堆栈扫描
+Copy	复制
+Refresh	刷新
+Close	关闭
+Input Prompt	输入提示
+Input Prompt	输入提示
+Input Prompt	输入提示
+&Ok	确定(&O)
+Cancel	取消(&C)
+String Search	字符串搜索
+Minimum length:	最小长度：
+OK	确定
+Cancel	取消(&C)
+Strings	字符串
+Options	选项(&O)
+Filter	过滤器(&F)
+Auditing	审计
+Add	添加
+Advanced	高级
+Remove	移除
+View	查看
+Process Monitor	进程监控
+Pause	暂停
+Filter	过滤
+Clear	清除
+Monitor	监控
+Pause	暂停
+Filter	过滤
+Clear	清除
+Latency	延迟
+Latency	延迟
+Panel layout	面板布局
+Context switches	上下文切换
+Interrupts	中断
+Deferred procedure calls	延迟过程调用
+System calls	系统调用
+Exception dispatches	异常调度
+Deltas	增量
+Context switches	上下文切换
+Interrupts	中断
+DPCs	DPC
+System calls	系统调用
+Exception dispatches	异常分派
+Totals	总计
+Context switches	上下文切换
+Interrupts	中断
+DPCs	DPC
+System calls	系统调用
+Exception dispatches	异常分派
+Symbols	符号
+Close	关闭
+CFG bitmap	配置位图
+Options	选项
+Refresh	刷新
+Close	关闭
+Status	状态
+Games	游戏
+Games	游戏
+Refresh	刷新
+Close	关闭
+Thread Context	线程上下文
+Close	关闭
+Containers	容器
+Run	运行
+Open	打开
+Pull	拉取
+Tag	标记
+Delete	删除
+Refresh	刷新
+Copy	复制
+Ready	就绪
+Close	关闭
+Attach to Process	附加到进程
+Connection type:	连接类型：
+Find	查找
+List	列表
+Tree	树形
+Show processes for all users	显示所有用户的进程
+Attach	附加
+Cancel	取消
+Run Container	运行容器
+Image:	镜像：
+Command:	命令：
+Process Isolation	进程隔离
+Ready	就绪
+Run	运行
+Cancel	取消
+Setting Editor	设置编辑器
+Name:	名称：
+Description:	描述：
+Supported:	支持：
+Value:	值：
+OK	确定
+Cancel	取消
+Edit Environment Variable	编辑环境变量
+New	新建
+Edit	编辑
+Browse...	浏览...
+Delete	删除
+Move Up	上移
+Move Down	下移
+Edit Text	编辑文本
+OK	确定
+Cancel	取消
+Environment Variables	编辑环境变量
+Add	新建
+Edit	编辑
+Delete	删除
+Close	关闭
+Socket	套接字
+System Informer dynamic data is not yet supported on this kernel version.	System Informer 动态数据不支持此内核版本。
+System Informer dynamic data version is incompatible.	System Informer 动态数据的版本不兼容。
+System Informer dynamic data is an invalid length.	System Informer 动态数据的长度无效。
+System Informer dynamic data signature is invalid.	System Informer 动态数据的签名无效。
+System Informer kernel library version is incompatible.	System Informer 内核库的版本不兼容。
+Copyright (c) Winsider Seminars & Solutions, Inc.  All rights reserved.	版权所有 (c) Winsider Seminars & Solutions 保留所有权利。

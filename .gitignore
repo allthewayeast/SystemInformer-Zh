@@ -1,0 +1,18 @@
+# 构建与词典流水线的中间产物
+/build/
+/dist/
+
+# 外部依赖：System Informer 源码树与测试副本，需自行准备（见 README）
+/si-src/
+/test-app/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# 运行期产物：zh_hook.dll 写出的未命中收集文件与日志，内容随机器变化
+zh_dict.missed.txt
+*.log
+
+# 截图中间产物（docs/ 里的 PNG 要提交，这里的 BMP 不要）
+*.bmp
