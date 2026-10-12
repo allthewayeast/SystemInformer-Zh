@@ -29,6 +29,10 @@ r"""
                                  build\zh_dict.index.tsv     （逐条出处，审计用）
                                  dict\zh_dict.txt            （部署用的最终词典）
         --[build.ps1]--------->  dist\zh_dict.txt
+
+  另有 dict\zh_dict.pattern.txt —— 通配符模式表，给「运行期拼出来的串」用
+  （进程气泡、状态栏那类）。它不进上面的流水线，是手工维护的输入，
+  由 tools\check_pattern.py 校验、build.ps1 原样拷到 dist\。
 """
 
 import os
@@ -52,6 +56,7 @@ PASSOLO = os.path.join(DICT, "passolo.txt")          # Passolo 导出的英中�
 BASE_DICT = os.path.join(DICT, "zh_dict.base.txt")   # 人工基线（第 1 段）
 RC_LITERALS = os.path.join(DICT, "rc_literals.json")  # .rc 资源串（rc_survey.py 产出）
 UI_GAP_TSV = os.path.join(DICT, "ui_gap.tsv")        # 源码 UI 串清单（ui_gap.py 产出）
+PATTERN = os.path.join(DICT, "zh_dict.pattern.txt")  # 通配符模式表（手工维护）
 
 # ---------------------------------------------------------------- 流水线产物
 MERGED = os.path.join(BUILD, "zh_dict.merged.txt")

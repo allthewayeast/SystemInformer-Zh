@@ -30,6 +30,24 @@
  *   选项： --log      写启动器日志与钩子日志（排障用，平时别开）
  *          --no-wait  启动完就退出，不驻留等待 System Informer 结束
  *          --check    只显示解析到的配置，不启动（用来自检）
+ *          --collect  打开「运行时未命中收集」（默认关，见下）
+ *
+ * --collect 与运行时未命中收集
+ *   收集器会把界面上出现过、但词典里没有的串持续追加到 zh_dict.missed.txt。
+ *   那是采集行为，不该「装好就一直在写」，所以**默认关**，只有带 --collect
+ *   启动时才开：本参数把子进程的 ZHHK_MISS 设成 1，钩子据此打开收集。
+ *   （不带参数的默认是 ZHHK_MISS=0；不走启动器直接加载 DLL 时同样默认关。）
+ *
+ *   走 IFEO 双击启动时，参数写在 Debugger 值里即可。IFEO 的语义是「把
+ *   Debugger 整串插到原命令行前面」（Raymond Chen《Image File Execution
+ *   Options just inserts the debugger in front of the command line》），
+ *   所以末尾追加参数是合法的：
+ *
+ *     Debugger = "D:\...\_zhcn\si_zh_launcher.exe" --collect
+ *
+ *   脚本做法见 scripts\collect.ps1（-On / -Off），它只改这一个值。
+ *   注意 Debugger 一旦指向不存在的文件，程序会直接起不来（不会回退去启动
+ *   原 exe）—— 所以改完务必用 scripts\verify-ifeo.ps1 自检。
  *
  * 图标与版本信息见 si_zh_launcher.rc；--check 的提示框用 MB_USERICON 显示它。
  */
@@ -199,7 +217,7 @@ static int Run(int argc, wchar_t** argv)
     PROCESS_INFORMATION pi;
     DEBUG_EVENT de;
     HANDLE evReady = NULL, evGo = NULL, evDone = NULL;
-    BOOL log = FALSE, noWait = FALSE, check = FALSE;
+    BOOL log = FALSE, noWait = FALSE, check = FALSE, collect = FALSE;
     DWORD err = 0;
     int i, rc = 0;
 
@@ -212,6 +230,7 @@ static int Run(int argc, wchar_t** argv)
             if (_wcsicmp(argv[i], L"--log") == 0)        { log = TRUE; continue; }
             if (_wcsicmp(argv[i], L"--no-wait") == 0)    { noWait = TRUE; continue; }
             if (_wcsicmp(argv[i], L"--check") == 0)      { check = TRUE; continue; }
+            if (_wcsicmp(argv[i], L"--collect") == 0)    { collect = TRUE; continue; }
             if (_wcsicmp(argv[i], L"--app") == 0 && i + 1 < argc)
             {
                 wcsncpy_s(target, MAX_PATH, argv[++i], _TRUNCATE);
@@ -262,6 +281,7 @@ static int Run(int argc, wchar_t** argv)
     Log(L"钩子 DLL   = %s (存在=%d)", dllPath, Exists(dllPath));
     Log(L"词典       = %s (存在=%d)", dictPath, Exists(dictPath));
     Log(L"子参数     = [%s]", childArgs);
+    Log(L"未命中收集 = %s", collect ? L"开（--collect）" : L"关（默认；需要时加 --collect）");
 
     if (!Exists(target))
     {
@@ -280,8 +300,10 @@ static int Run(int argc, wchar_t** argv)
     {
         wchar_t msg[2048];
         _snwprintf_s(msg, _countof(msg), _TRUNCATE,
-                     L"目标：\n%s\n\n钩子 DLL：\n%s\n\n词典：\n%s\n\n日志：%s",
-                     target, dllPath, dictPath, log ? L"开" : L"关");
+                     L"目标：\n%s\n\n钩子 DLL：\n%s\n\n词典：\n%s\n\n"
+                     L"日志：%s\n\n未命中收集：%s",
+                     target, dllPath, dictPath, log ? L"开" : L"关",
+                     collect ? L"开（--collect）" : L"关（默认）");
         MessageBoxW(NULL, msg, L"si_zh_launcher --check", MB_OK | MB_USERICON);
         return 0;
     }
@@ -289,6 +311,11 @@ static int Run(int argc, wchar_t** argv)
     /* ---- 子进程环境：这正是旧 POC 靠 os.environ 传、容易漏的东西 ---- */
     SetEnvironmentVariableW(L"ZHHK_DICT", dictPath);
     SetEnvironmentVariableW(L"ZHHK_TRANSLATE", L"1");
+
+    /* 运行时未命中收集：默认关，只有 --collect 才开（详见文件头）。
+     * 两个值都显式写：子进程的状态完全由本次启动参数决定，
+     * 不受启动器自身所处环境里有没有 ZHHK_MISS 影响。 */
+    SetEnvironmentVariableW(L"ZHHK_MISS", collect ? L"1" : L"0");
     if (log)
     {
         wchar_t hookLog[MAX_PATH];

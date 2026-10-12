@@ -6,7 +6,8 @@
     产物：
       dist\si_zh_launcher.exe   启动器（含 assets\systemInformer-zh.ico 图标）
       dist\zh_hook.dll          显示层钩子，由启动器注入到 SystemInformer.exe
-      dist\zh_dict.txt          词典
+      dist\zh_dict.txt          词典（精确匹配）
+      dist\zh_dict.pattern.txt  通配符模式表（拼出来的串）
 
     只依赖两样东西：Visual Studio 的 C++ 工具链（自动定位），以及仓库里
     src\third_party\minhook 自带的 MinHook 源码。不需要 CMake、不需要 vcpkg。
@@ -44,8 +45,9 @@ $mhRoot  = Join-Path $repo 'src\third_party\minhook'
 $mhInc   = Join-Path $mhRoot 'include'
 $mhSrc   = Join-Path $mhRoot 'src'
 $dictSrc = Join-Path $repo 'dict\zh_dict.txt'
+$patSrc  = Join-Path $repo 'dict\zh_dict.pattern.txt'
 
-foreach ($p in $hookSrc, $lchSrc, $lrcSrc, $dictSrc) {
+foreach ($p in $hookSrc, $lchSrc, $lrcSrc, $dictSrc, $patSrc) {
     if (-not (Test-Path $p)) { throw "缺少源文件：$p" }
 }
 if (-not (Test-Path (Join-Path $mhSrc 'hook.c'))) { throw "缺少 MinHook 源码：$mhSrc" }
@@ -88,6 +90,25 @@ function Find-VcVars {
 
 $vcvars = Find-VcVars -Explicit $VcVars
 Write-Output "工具链 : $vcvars"
+
+# ---------------------------------------------------------------- 校验模式表
+# 放在编译之前：模式表写错（比如行尾多了个注释，那会变成译文的一部分）编译期
+# 是发现不了的，只能考校验脚本。没有 python 就跳过，不阻塞构建。
+if (Get-Command python -ErrorAction SilentlyContinue) {
+    Write-Output ''
+    Write-Output '--- 校验通配符模式表 ---'
+    Push-Location $repo
+    try {
+        python (Join-Path $repo 'tools\check_pattern.py') --strict
+        $patRc = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
+    if ($patRc -ne 0) { throw "模式表校验未通过（tools\check_pattern.py --strict, exit=$patRc）" }
+} else {
+    Write-Output ''
+    Write-Output '未找到 python，跳过模式表校验'
+}
 
 # ---------------------------------------------------------------- 目录
 if ($Clean) {
@@ -137,8 +158,9 @@ finally {
     Pop-Location
 }
 
-# ---------------------------------------------------------------- 词典
+# ---------------------------------------------------------------- 词典 + 模式表
 Copy-Item $dictSrc (Join-Path $dist 'zh_dict.txt') -Force
+Copy-Item $patSrc  (Join-Path $dist 'zh_dict.pattern.txt') -Force
 
 Remove-Item $obj -Recurse -Force -ErrorAction SilentlyContinue
 

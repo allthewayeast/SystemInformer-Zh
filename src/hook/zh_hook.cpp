@@ -33,21 +33,37 @@
  *   B. 本进程模块的 IAT 改写 —— 补充手段，抢在延迟加载完成前生效
  *   C. 本线程的 WH_CALLWNDPROC —— 兜底。CWPSTRUCT 是值拷贝，只能原地改内存
  *
- * 词典
- *   UTF-8 文本，每行「原文<TAB>译文」，# 开头为注释。译文为空的条目会被跳过，
- *   所以自动收集来的待翻译条目（译文留空）放在词典里不影响运行。
- *   词典在启动时一次性读入，改词不必重编译本 DLL。
+ * 翻译表（两张，都是 UTF-8 文本、启动时读入，改词不必重编译本 DLL）
+ *
+ *   1) zh_dict.txt          精确匹配。每行「原文<TAB>译文」，# 开头为注释。
+ *                           译文为空的条目会被跳过，所以自动收集来的待翻译
+ *                           条目（译文留空）留在里面不影响运行。
+ *
+ *   2) zh_dict.pattern.txt  通配符匹配。**可选**，没有就不启用。
+ *                           词典是精确匹配，匹配不了 System Informer 里大量
+ *                           「运行期拼出来」的串（状态栏 "CPU usage: 1.82%"、
+ *                           进程气泡 "Console application: svchost.exe (2180)"
+ *                           ……），这些只能靠模式。格式与匹配规则见下方
+ *                           「通配符模式翻译」一节。
  *
  * 环境变量
- *   ZHHK_DICT      词典路径（UTF-8）。默认 = 本 DLL 同目录的 zh_dict.txt
- *   ZHHK_MISS      未命中收集文件路径。默认 = 词典同目录的 zh_dict.missed.txt
- *   ZHHK_MISSFLUSH 周期刷新间隔（秒，默认 15，0 = 关闭）
+ *   ZHHK_DICT      词典路径。默认 = 本 DLL 同目录的 zh_dict.txt
+ *   ZHHK_PATTERN   模式表路径。默认 = 词典同目录的 zh_dict.pattern.txt
  *   ZHHK_TRANSLATE 1 = 真正替换文本（默认 0 = 只观察不改）
  *   ZHHK_LOG       日志文件路径（UTF-16LE）。不设则不记日志
  *   ZHHK_LOGALL    1 = 记录所有绘制调用（排障用，日志会很大）
- *   ZHHK_MISSALL   1 = 关掉「像不像界面文字」过滤，未命中收集全都收
  *   ZHHK_HOOKS     只启用指定类别，如 "SM,DT,TO"（排障用）
  *   ZHHK_TRACETB   1 = 追踪工具栏/表头范围的消息（排障用）
+ *
+ *   —— 以下两组只在「运行时未命中收集」打开时才有意义 ——
+ *   ZHHK_MISS      收集开关。**默认关闭**：未设 = 关。
+ *                  正常用法是给启动器加 --collect（见 si_zh_launcher.c），
+ *                  由它把这里设成 1。取值：
+ *                    未设 / 0 / off / false  -> 关
+ *                    1 / on / true           -> 开，文件落在词典同目录
+ *                    其它值                  -> 开，且该值就是文件路径
+ *   ZHHK_MISSFLUSH 周期刷新间隔（秒，默认 15，0 = 关闭）
+ *   ZHHK_MISSALL   1 = 关掉「像不像界面文字」过滤，未命中收集全都收
  *
  * 运行时未命中收集
  *   见下方「运行时未命中收集」一节 —— 把界面上出现过、词典里没有的串写到专有
@@ -182,7 +198,9 @@ static int      g_missSlot[MISS_SLOT];   // 0 = 空槽，否则 g_miss 下标 + 
 static int      g_missCount = 0;
 static HANDLE   g_missFile  = INVALID_HANDLE_VALUE;
 static wchar_t  g_missPath[MAX_PATH];
-static BOOL     g_missEnabled = TRUE;
+// **默认关闭**。收集会在真实使用中持续往磁盘写文件，属于排障/采集行为，
+// 不该是「装好就一直在写」的默认状态；要收集就显式给启动器加 --collect。
+static BOOL     g_missEnabled = FALSE;
 static BOOL     g_missDone    = FALSE;   // 退出刷新只做一次（DETACH 与钩子可能都触发）
 static BOOL     g_missAll     = FALSE;   // ZHHK_MISSALL=1 时不做「像不像界面文字」过滤
 static LONG     g_missSkipped = 0;       // 被过滤掉的次数（只用于日志）
@@ -247,7 +265,9 @@ static const char MISS_HEADER[] =
     "\xEF\xBB\xBF"                                            // UTF-8 BOM，记事本可直接打开
     "# System Informer 中文词典 · 运行时未命中收集\r\n"
     "# 由 zh_hook.dll 在运行期自动追加维护。本文件【不会】被词典加载器读取，\r\n"
-    "# 合并进词典请运行: python _work\\dict\\merge_missed.py\r\n"
+    "# 合并进词典请运行: python tools\\merge_missed.py\r\n"
+    "#\r\n"
+    "# 只有启动时带了 --collect 的运行才会写入本文件（默认不收集）。\r\n"
     "# 字段: 原文 <TAB> 次数 <TAB> API <TAB> 控件链 <TAB> 列表列头 <TAB> 所在列\r\n"
     "# 同一原文只占一行；跨次运行不重复（启动时会先读回已有键和指纹）。\r\n"
     "#\r\n"
@@ -1210,6 +1230,519 @@ static void LoadDict(void)
          lines, nEmpty, nComment, nNoTab, nConvFail, g_entryCount);
 }
 
+// ===========================================================================
+// 通配符模式翻译
+// ===========================================================================
+//
+// 为什么需要单独一套
+//   词典是**精确匹配**，而 System Informer 里有大量「运行期拼出来」的串：
+//
+//     状态栏   L"CPU usage: %s"                 ->  "CPU usage: 1.82%"
+//     进程气泡 L"Console application: %s (%lu)"  ->  "Console application: svchost.exe (2180)"
+//     列表菜单 L"Copy \"%s\""                    ->  'Copy "explorer.exe"'
+//     插件菜单 L"Save for %s"
+//
+//   这些串每次运行内容都不一样，精确匹配永远命中不了 —— 收集器只能把它们反复
+//   写进未命中文件（实测：某次运行 352 条收集里 344 条是这类碎片，主因就是
+//   进程气泡那一整串）。
+//
+// 格式（独立文件 zh_dict.pattern.txt，与词典同样的「原文<TAB>译文」）
+//   原文里的通配符：
+//     *        任意长度（可为空）的片段，并**捕获**它
+//     ?        恰好一个字符，不捕获
+//     \* \? \\ 转义，表示字面量
+//   译文里的占位符：
+//     *        依次取「还没被用过的」捕获（第 1 个 * 取捕获 1，以此类推）
+//     \1..\9   显式取第 N 个捕获（可换序、可重复引用）
+//     \\       字面反斜杠
+//   译文中没用到的捕获会按顺序追加到末尾 —— 宁可译文有点啰嗦，也不让界面上的
+//   数据悄悄消失。占位符比通配符少会在启动日志里告警，tools/check_pattern.py
+//   也能在构建期查出来。
+//
+// 应用方式：**反复过所有模式，直到某一遍完全没改动**（上限 PAT_PASS 遍）。
+//   为什么不是「命中一条就返回」：进程气泡那种
+//     "… Notes: … Signer: … Console application: … Flags: …"
+//   是整串画出来的，一条模式只能换掉其中一个字段标签，多遍才能全换完。
+//
+// 写模式时必须知道的四个性质
+//   1. `*` 取**最短**可行片段，不是贪婪。所以 '*A: *' 里第一个 * 只吃到 A: 之前
+//      那一段，不会把整串吞掉。
+//   2. 首尾都带 *（如 '*Process is *'）等价于「子串替换」。
+//   3. 顺序有意义：文件里**靠前的先匹配**。多遍应用时，宽泛的模式若排在具体
+//      模式前面，会把后者的目标文本先改掉 —— 具体写前面，宽泛写后面。
+//   4. **多行文本不套模式**（见 MatchPatterns 里的说明）：那种串的行距是调用方
+//      按原文宽度算好的，换成中文宽度就画错。所以气泡那类整串多行的文字，
+//      模式救不了 —— 它只能靠 zh_dict.txt 精确匹配，或者干脆不译。
+//
+// 性能：模式只在**精确匹配落空之后**才试；先用「字面前缀」和「长度下界」两道
+//   预筛排除掉绝大多数模式（进程气泡那 350 条碎片的经验是：平均一条串只真正
+//   进入匹配 1~2 条模式）。匹配本身还有步数预算兜底，杜绝病态模式把界面拖死。
+
+#define PAT_MAX        256      // 最多多少条模式
+#define PAT_TEXTLEN    512      // 单条原文/译文的长度上限
+#define PAT_MAXCAP     8        // 单条模式里最多几个捕获
+#define PAT_PFX        48       // 预筛用的字面前缀长度上限
+#define PAT_INPUT_MAX  1024     // 超过这个长度就不试模式了（界面文字不会这么长）
+#define PAT_BUDGET     20000    // 单次匹配的递归步数预算（防病态模式）
+#define PAT_PASS       4        // 同一条模式最多反复应用几轮
+#define PAT_LOG_HITS   200      // 模式命中日志最多记多少条（防日志爆炸）
+
+struct PatEntry
+{
+    wchar_t pat[PAT_TEXTLEN];
+    wchar_t zh[PAT_TEXTLEN];
+    wchar_t pfx[PAT_PFX];   // 第一个通配符之前的字面前缀（预筛用）
+    int     pfxLen;
+    int     literal;        // 通配符之外的字面字符数 = 匹配长度的下界
+    int     caps;           // 原文里的 * 个数
+    int     holes;          // 译文里的占位符个数
+};
+
+static PatEntry g_pat[PAT_MAX];
+static int      g_patCount = 0;
+static wchar_t  g_patPath[MAX_PATH];
+static volatile LONG g_patHits = 0;
+
+// 大小写处理：只折 ASCII。词典侧用的是 _wcsicmp，这里保持一致的口径就够 ——
+// 界面原文都是英文，非 ASCII 一律按原样比较。
+static wchar_t PatUp(wchar_t c)
+{
+    return (c >= L'a' && c <= L'z') ? (wchar_t)(c - 32) : c;
+}
+
+static BOOL PatSame(wchar_t a, wchar_t b)
+{
+    return PatUp(a) == PatUp(b);
+}
+
+// 算出一条模式的预筛信息（字面前缀 / 长度下界 / 通配符数 / 占位符数）。
+static void PatAnalyze(PatEntry* e)
+{
+    int i, n = 0;
+    BOOL wild = FALSE;
+
+    e->caps = 0;
+    e->literal = 0;
+
+    for (i = 0; e->pat[i]; i++)
+    {
+        wchar_t c = e->pat[i];
+
+        if (c == L'\\' && (e->pat[i + 1] == L'*' || e->pat[i + 1] == L'?' || e->pat[i + 1] == L'\\'))
+        {
+            c = e->pat[++i];               // 转义：当字面量
+        }
+        else if (c == L'*' || c == L'?')
+        {
+            if (c == L'*')
+                e->caps++;
+            wild = TRUE;                   // 前缀到此为止
+            continue;
+        }
+
+        e->literal++;
+        if (!wild && n < PAT_PFX - 1)
+            e->pfx[n++] = c;
+    }
+
+    e->pfx[n] = L'\0';
+    e->pfxLen = n;
+
+    e->holes = 0;
+    for (i = 0; e->zh[i]; i++)
+    {
+        if (e->zh[i] == L'\\' && e->zh[i + 1] == L'\\')
+        {
+            i++;
+            continue;
+        }
+        if (e->zh[i] == L'\\' && e->zh[i + 1] >= L'1' && e->zh[i + 1] <= L'9')
+        {
+            e->holes++;
+            i++;
+            continue;
+        }
+        if (e->zh[i] == L'*')
+            e->holes++;
+    }
+}
+
+struct PatCap { int start; int len; };
+
+struct PatTry
+{
+    PatCap caps[PAT_MAXCAP];
+    int    nCaps;
+    int    budget;
+};
+
+// p = 模式，s = 当前文本位置，base = 文本起点（捕获存相对 base 的偏移）。
+// 递归深度 = 模式里 * 的段数（连续的 * 已折叠），有界；回溯规模由 budget 兜底。
+static BOOL PatMatch(const wchar_t* p, const wchar_t* s, const wchar_t* base, PatTry* t)
+{
+    while (*p)
+    {
+        if (t->budget-- <= 0)
+            return FALSE;
+
+        if (*p == L'\\' && (p[1] == L'*' || p[1] == L'?' || p[1] == L'\\'))
+        {
+            if (!*s || !PatSame(*s, p[1]))
+                return FALSE;
+            p += 2;
+            s++;
+            continue;
+        }
+
+        if (*p == L'*')
+        {
+            int idx;
+            const wchar_t* q;
+
+            while (*p == L'*')                 // ** 与 * 等价
+                p++;
+
+            idx = (t->nCaps < PAT_MAXCAP) ? t->nCaps++ : -1;
+
+            for (q = s; ; q++)                 // 最短优先：先试空片段
+            {
+                int save = t->nCaps;
+
+                if (idx >= 0)
+                {
+                    t->caps[idx].start = (int)(s - base);
+                    t->caps[idx].len = (int)(q - s);
+                }
+                if (PatMatch(p, q, base, t))
+                    return TRUE;
+
+                t->nCaps = save;
+                if (!*q)
+                    break;                     // 已试到串尾，没有别的可能了
+            }
+            return FALSE;
+        }
+
+        if (*p == L'?')
+        {
+            if (!*s)
+                return FALSE;
+            p++;
+            s++;
+            continue;
+        }
+
+        if (!*s || !PatSame(*p, *s))
+            return FALSE;
+        p++;
+        s++;
+    }
+
+    return *s == L'\0';
+}
+
+// 把译文里的占位符换成捕获。返回 FALSE = 结果放不下（调用方按「不匹配」处理）。
+static BOOL PatExpand(const PatEntry* e, const wchar_t* s, const PatTry* t,
+                      wchar_t* out, int outCap)
+{
+    int used[PAT_MAXCAP];
+    int i, o = 0, k;
+
+    for (i = 0; i < PAT_MAXCAP; i++)
+        used[i] = 0;
+
+    for (i = 0; e->zh[i]; i++)
+    {
+        const wchar_t* piece;
+        int pieceLen;
+
+        if (e->zh[i] == L'\\' && e->zh[i + 1] == L'\\')
+        {
+            if (o + 2 > outCap)
+                return FALSE;
+            out[o++] = L'\\';
+            i++;
+            continue;
+        }
+
+        if (e->zh[i] == L'\\' && e->zh[i + 1] >= L'1' && e->zh[i + 1] <= L'9')
+        {
+            k = e->zh[i + 1] - L'1';
+            i++;
+        }
+        else if (e->zh[i] == L'*')
+        {
+            k = -1;
+            for (int j = 0; j < t->nCaps; j++)
+            {
+                if (!used[j]) { k = j; break; }
+            }
+            if (k < 0)
+                continue;                      // 捕获已用完：这个 * 输出空
+        }
+        else
+        {
+            if (o + 2 > outCap)
+                return FALSE;
+            out[o++] = e->zh[i];
+            continue;
+        }
+
+        piece = (k < t->nCaps) ? (s + t->caps[k].start) : NULL;
+        pieceLen = (k < t->nCaps) ? t->caps[k].len : 0;
+        if (k < t->nCaps)
+            used[k] = 1;
+
+        if (pieceLen > 0)
+        {
+            if (o + pieceLen + 1 > outCap)
+                return FALSE;
+            wmemcpy(out + o, piece, (size_t)pieceLen);
+            o += pieceLen;
+        }
+    }
+
+    // 译文没引用到的捕获追加到末尾 —— 不静默丢数据。
+    {
+        BOOL any = FALSE;
+
+        for (i = 0; i < t->nCaps; i++)
+        {
+            if (!used[i] && t->caps[i].len > 0) { any = TRUE; break; }
+        }
+        if (any)
+        {
+            if (o + 2 > outCap)
+                return FALSE;
+            out[o++] = L' ';
+            for (i = 0; i < t->nCaps; i++)
+            {
+                if (used[i] || t->caps[i].len <= 0)
+                    continue;
+                if (o + t->caps[i].len + 2 > outCap)
+                    return FALSE;
+                wmemcpy(out + o, s + t->caps[i].start, (size_t)t->caps[i].len);
+                o += t->caps[i].len;
+                out[o++] = L' ';
+            }
+            o--;                                // 去掉最后那个空格
+        }
+    }
+
+    out[o] = L'\0';
+    return TRUE;
+}
+
+// 对一条模式应用一次。返回 TRUE = 命中（且译文与原文不同）。
+static BOOL PatApply(const PatEntry* e, const wchar_t* in, wchar_t* out, int outCap)
+{
+    wchar_t cur[MAX_TEXTLEN];
+    PatTry t;
+    int i, slen;
+
+    slen = (int)wcslen(in);
+    if (slen <= 0 || slen > PAT_INPUT_MAX)
+        return FALSE;
+    if (slen < e->literal)                     // 预筛 1：长度下界
+        return FALSE;
+    if (slen < e->pfxLen)
+        return FALSE;
+
+    for (i = 0; i < e->pfxLen; i++)            // 预筛 2：字面前缀
+    {
+        if (!PatSame(in[i], e->pfx[i]))
+            return FALSE;
+    }
+
+    t.nCaps = 0;
+    t.budget = PAT_BUDGET;
+
+    if (!PatMatch(e->pat, in, in, &t))
+        return FALSE;
+    if (!PatExpand(e, in, &t, cur, MAX_TEXTLEN))
+        return FALSE;
+    if (wcscmp(cur, in) == 0)
+        return FALSE;                          // 译文没引用任何捕获：等于没变
+
+    wcsncpy_s(out, outCap, cur, _TRUNCATE);
+    return TRUE;
+}
+
+// 模式匹配总入口。
+//
+// 一遍又一遍地过**所有**模式，直到某一遍完全没改动（上限 PAT_PASS 遍）。
+// 为什么不是「命中一条就返回」：进程气泡那种串是
+//   "… Notes: … Signer: … Console application: … Flags: …"
+// 一整串画出来的，一条模式只能换掉其中一个字段标签，必须多遍才能全换完。
+//
+// s 与 out 可以是同一块缓冲区：整个过程都在 cur 里做，最后才写 out。
+static const wchar_t* MatchPatterns(const wchar_t* s, wchar_t* out, int outCap)
+{
+    wchar_t cur[MAX_TEXTLEN];
+    wchar_t nxt[MAX_TEXTLEN];
+    BOOL changed = FALSE;
+    int pass, i;
+
+    if (g_patCount <= 0 || !s || !*s)
+        return NULL;
+
+    // 多行文本一律不套模式。
+    //
+    // 为什么：进程提示气泡那种「一整串多行文字」是 SI 自己算好行距再逐行画的，
+    // 它按**原文**的宽度算布局。我们把其中几个字段标签换成中文，字的宽度就变了
+    // （"Signer:" 6 个半角 vs "签名者：" 4 个全角），SI 那边并不知道 —— 实测结果是
+    // 气泡的几行叠在一起、糊成一团。这是**画错**，比不翻译糟糕得多。
+    //
+    // 精确匹配的词典不受这条限制：词典命中的是整串一一对应，本来就命中不了
+    // 这种拼出来的多行串，两者互不影响。
+    if (wcschr(s, L'\n') || wcschr(s, L'\r'))
+        return NULL;
+
+    wcsncpy_s(cur, MAX_TEXTLEN, s, _TRUNCATE);
+
+    for (pass = 0; pass < PAT_PASS; pass++)
+    {
+        BOOL any = FALSE;
+
+        for (i = 0; i < g_patCount; i++)
+        {
+            if (!PatApply(&g_pat[i], cur, nxt, MAX_TEXTLEN))
+                continue;
+
+            wcsncpy_s(cur, MAX_TEXTLEN, nxt, _TRUNCATE);
+            any = TRUE;
+            changed = TRUE;
+
+            if (InterlockedIncrement(&g_patHits) <= PAT_LOG_HITS)
+                Logf(L"[pat] #%d 第 %d 遍改写为 \"%s\"", i, pass + 1, cur);
+        }
+
+        if (!any)
+            break;
+    }
+
+    if (!changed)
+        return NULL;
+
+    wcsncpy_s(out, outCap, cur, _TRUNCATE);
+    return out;
+}
+
+static void LoadPatterns(void)
+{
+    char* raw = NULL;
+    DWORD size = 0;
+    char* line;
+    char* next;
+    int lines = 0, nBad = 0, nWarn = 0;
+
+    if (!*g_patPath)
+        return;
+    if (!ReadWholeFileW(g_patPath, &raw, &size))
+    {
+        Logf(L"[pat] 没有模式表（可选，不是错误）: %s", g_patPath);
+        return;
+    }
+
+    Logf(L"[pat] path=%s (%lu 字节)", g_patPath, size);
+
+    line = raw;
+    while (line && *line)
+    {
+        char* nl;
+        char* tab;
+
+        next = line;
+        nl = strchr(line, '\n');
+        if (nl)
+        {
+            *nl = '\0';
+            next = nl + 1;
+        }
+        else
+        {
+            next = NULL;
+        }
+
+        lines++;
+
+        if (line[0] == (char)0xEF && line[1] == (char)0xBB && line[2] == (char)0xBF)
+            line += 3;
+
+        if (line[0] != '\0' && line[0] != '#')
+        {
+            tab = strchr(line, '\t');
+            if (!tab)
+            {
+                nBad++;
+                if (nBad <= 3)
+                    Logf(L"[pat] 第 %d 行没有 TAB，已忽略: \"%hs\"", lines, line);
+            }
+            else
+            {
+                wchar_t pat[PAT_TEXTLEN], zh[PAT_TEXTLEN];
+
+                *tab = '\0';
+                if (MultiByteToWideChar(CP_UTF8, 0, line, -1, pat, PAT_TEXTLEN) <= 0 ||
+                    MultiByteToWideChar(CP_UTF8, 0, tab + 1, -1, zh, PAT_TEXTLEN) <= 0)
+                {
+                    nBad++;
+                    if (nBad <= 3)
+                        Logf(L"[pat] 第 %d 行 UTF-8 转换失败", lines);
+                }
+                else
+                {
+                    size_t n = wcslen(pat);
+                    if (n > 0 && pat[n - 1] == L'\r') pat[n - 1] = L'\0';
+                    n = wcslen(zh);
+                    if (n > 0 && zh[n - 1] == L'\r') zh[n - 1] = L'\0';
+
+                    if (!pat[0] || !zh[0])
+                    {
+                        nBad++;
+                    }
+                    else if (g_patCount >= PAT_MAX)
+                    {
+                        nBad++;
+                        if (nBad <= 3)
+                            Logf(L"[pat] 模式数超过上限 %d，多余的被忽略", PAT_MAX);
+                    }
+                    else
+                    {
+                        PatEntry* e = &g_pat[g_patCount];
+
+                        wcscpy_s(e->pat, PAT_TEXTLEN, pat);
+                        wcscpy_s(e->zh, PAT_TEXTLEN, zh);
+                        PatAnalyze(e);
+
+                        if (e->caps == 0)
+                        {
+                            nWarn++;
+                            Logf(L"[pat] 第 %d 行没有任何通配符，应放进 zh_dict.txt 走精确匹配: \"%s\"",
+                                 lines, pat);
+                        }
+                        else if (e->holes < e->caps)
+                        {
+                            nWarn++;
+                            Logf(L"[pat] 第 %d 行译文占位符(%d)少于原文通配符(%d)，"
+                                 L"没被引用的捕获会追加到译文末尾: \"%s\"",
+                                 lines, e->holes, e->caps, pat);
+                        }
+
+                        g_patCount++;
+                    }
+                }
+            }
+        }
+
+        line = next;
+    }
+
+    HeapFree(GetProcessHeap(), 0, raw);
+    Logf(L"[pat] 载入 %d 条模式（扫描 %d 行 / 坏行 %d / 告警 %d）",
+         g_patCount, lines, nBad, nWarn);
+}
+
 // ---------------------------------------------------------------- 翻译
 
 // 词典查找（输入已在 key 中）——哈希比对，未命中才做全等比较
@@ -1269,19 +1802,42 @@ static const wchar_t* TryTranslate(const wchar_t* s, wchar_t* out, int outCap)
     }
 
     h = HashStr(out);
+
+    // 1) 精确匹配
     r = LookupDict(out, len, out, outCap);
 
-    if (!r && wcschr(out, L'&'))
+    // 去 & 后的形态：词典允许以「去掉 & 加速键前缀」的形式书写，
+    // 模式表同理（源码里不少菜单串是 L"&Copy\bCtrl+C" 这种）。
     {
-        // 允许词典以「去掉 & 加速键前缀」的形式书写
         wchar_t stripped[MAX_TEXTLEN];
+        BOOL hasAmp = FALSE;
         int k = 0;
+
         for (int i = 0; out[i]; i++)
-            if (out[i] != L'&')
+        {
+            if (out[i] == L'&')
+                hasAmp = TRUE;
+            else
                 stripped[k++] = out[i];
+        }
         stripped[k] = L'\0';
-        if (k > 0)
+
+        // 2) 精确匹配（去 & 形态）
+        if (!r && hasAmp && k > 0)
             r = LookupDict(stripped, k, out, outCap);
+
+        // 3) 通配符模式。运行期拼出来的串只能靠这一步（见「通配符模式翻译」）。
+        //    src 是必需的：MatchPatterns 会把结果写回 out，而那正是它的输入。
+        if (!r && g_patCount > 0)
+        {
+            wchar_t src[MAX_TEXTLEN];
+
+            wcsncpy_s(src, MAX_TEXTLEN, out, _TRUNCATE);
+            r = MatchPatterns(src, out, outCap);
+
+            if (!r && hasAmp && k > 0)
+                r = MatchPatterns(stripped, out, outCap);
+        }
     }
 
     (void)h;
@@ -2211,6 +2767,10 @@ static void ReadEnv(void)
     if (n == 0 || n >= MAX_PATH)
         g_dictPath[0] = L'\0';
 
+    n = GetEnvironmentVariableW(L"ZHHK_PATTERN", g_patPath, MAX_PATH);
+    if (n == 0 || n >= MAX_PATH)
+        g_patPath[0] = L'\0';
+
     g_doTranslate = GetEnvironmentVariableW(L"ZHHK_TRANSLATE", NULL, 0) > 0;
     g_traceTb = GetEnvironmentVariableW(L"ZHHK_TRACETB", NULL, 0) > 0;
 
@@ -2238,29 +2798,68 @@ static void ReadEnv(void)
         }
     }
 
-    // 未命中收集文件。默认落在词典同目录，命名为 zh_dict.missed.txt。
-    // 注意：这个文件是**程序自己维护**的，不要手写；手写的内容 merge_missed.py
-    // 会当作「未命中原文」处理。
-    n = GetEnvironmentVariableW(L"ZHHK_MISS", g_missPath, MAX_PATH);
-    if (n > 0 && n < MAX_PATH)
+    // 模式表默认与词典同目录。它是可选的：文件不在就只是没有模式匹配。
+    if (!g_patPath[0] && g_dictPath[0])
     {
-        if (_wcsicmp(g_missPath, L"0") == 0)      // ZHHK_MISS=0 显式关闭收集
+        wchar_t* slash;
+        wcscpy_s(g_patPath, MAX_PATH, g_dictPath);
+        slash = wcsrchr(g_patPath, L'\\');
+        if (slash)
+            wcscpy_s(slash + 1, MAX_PATH - (slash + 1 - g_patPath), L"zh_dict.pattern.txt");
+    }
+
+    // ------------------------------------------------------------------
+    // 未命中收集：**默认关闭**。
+    //
+    // 它是采集/排障行为（会持续往磁盘追加文件），不该「装好就一直在写」。
+    // 正常用法是给启动器加 --collect，由启动器把 ZHHK_MISS 设成 1；
+    // 直接加载本 DLL（不走启动器）时不设任何东西就是关的。
+    //
+    // ZHHK_MISS 的取值：未设/0/off/false = 关；1/on/true = 开（默认路径）；
+    // 其它值 = 开，且该值就是文件路径（向后兼容旧写法）。
+    // ------------------------------------------------------------------
+    {
+        wchar_t v[MAX_PATH];
+
+        n = GetEnvironmentVariableW(L"ZHHK_MISS", v, MAX_PATH);
+
+        if (n == 0 || n >= MAX_PATH)
+        {
+            g_missEnabled = FALSE;
+        }
+        else if (_wcsicmp(v, L"0") == 0 || _wcsicmp(v, L"off") == 0 || _wcsicmp(v, L"false") == 0)
         {
             g_missEnabled = FALSE;
             g_missPath[0] = L'\0';
         }
+        else if (_wcsicmp(v, L"1") == 0 || _wcsicmp(v, L"on") == 0 || _wcsicmp(v, L"true") == 0)
+        {
+            g_missEnabled = TRUE;                  // 路径下面派生
+        }
+        else
+        {
+            g_missEnabled = TRUE;
+            wcsncpy_s(g_missPath, MAX_PATH, v, _TRUNCATE);
+        }
     }
-    else if (g_dictPath[0])
+
+    // 未命中收集文件：默认落在词典同目录，命名为 zh_dict.missed.txt。
+    // 注意：这个文件是**程序自己维护**的，不要手写；手写的内容 merge_missed.py
+    // 会当作「未命中原文」处理。
+    if (g_missEnabled && !g_missPath[0])
     {
-        wchar_t* slash;
-        wcscpy_s(g_missPath, MAX_PATH, g_dictPath);
-        slash = wcsrchr(g_missPath, L'\\');
-        if (slash)
-            wcscpy_s(slash + 1, MAX_PATH - (slash + 1 - g_missPath), L"zh_dict.missed.txt");
-    }
-    else
-    {
-        g_missEnabled = FALSE;
+        if (g_dictPath[0])
+        {
+            wchar_t* slash;
+            wcscpy_s(g_missPath, MAX_PATH, g_dictPath);
+            slash = wcsrchr(g_missPath, L'\\');
+            if (slash)
+                wcscpy_s(slash + 1, MAX_PATH - (slash + 1 - g_missPath), L"zh_dict.missed.txt");
+        }
+        else
+        {
+            g_missEnabled = FALSE;                 // 词典路径都没有，无从派生
+        }
     }
 
     // 周期检查点间隔（秒）。0 = 关闭周期刷新（只靠追加 + 退出钩子）。
@@ -2317,8 +2916,12 @@ BOOL WINAPI DllMain(HINSTANCE self, DWORD reason, LPVOID reserved)
 
         LoadDict();
 
+        // 通配符模式表（可选）。必须在 LoadDict 之后：g_patPath 的默认值是从
+        // g_dictPath 派生的。
+        LoadPatterns();
+
         // 运行时未命中收集：先读回历史（跨次运行不重复），再开追加句柄。
-        // 必须在 LoadDict 之后：g_missPath 的默认值是从 g_dictPath 派生的。
+        // 这两步在 g_missEnabled 为假时直接返回 —— 默认就是关的。
         MissLoadExisting();
         MissOpen();
 

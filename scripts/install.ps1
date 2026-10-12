@@ -5,8 +5,8 @@
 
 .DESCRIPTION
     做三件事：
-      1. 把 dist\ 里的 si_zh_launcher.exe / zh_hook.dll / zh_dict.txt 铺到
-         <AppDir>\_zhcn\（独立子目录，不与程序自带文件混在一起）；
+      1. 把 dist\ 里的 si_zh_launcher.exe / zh_hook.dll / zh_dict.txt /
+         zh_dict.pattern.txt 铺到 <AppDir>\_zhcn\（独立子目录，不与程序自带文件混在一起）；
       2. 把该目录下原有的 Debugger 值备份到 _zhcn\ifeo_backup.txt；
       3. 写 IFEO 的 Debugger 值，让双击 SystemInformer.exe 时改由启动器接管。
 
@@ -49,7 +49,7 @@ if (-not $Dist) { $Dist = Join-Path $repo 'dist' }
 
 $IFEO_ROOT = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
 $KEY       = "$IFEO_ROOT\SystemInformer.exe"
-$FILES     = 'si_zh_launcher.exe', 'zh_hook.dll', 'zh_dict.txt'
+$FILES     = 'si_zh_launcher.exe', 'zh_hook.dll', 'zh_dict.txt', 'zh_dict.pattern.txt'
 
 function Assert-Admin {
     $id = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -137,6 +137,10 @@ if ($NoIfeo) {
 }
 
 # ---------------------------------------------------------------- 3) 写 IFEO
+# Debugger 值一律写成**带引号**的形式。安装目录通常含空格，未加引号的路径交给
+# 命令行解析是有歧义的（CreateProcess 会逐个空格切出候选名去试）；带引号是文档
+# 明确支持的形式，也才谈得上在后面安全地追加参数（scripts\collect.ps1 就是往
+# 这个值末尾加 --collect）。
 New-Item -Path $KEY -Force | Out-Null
 Set-ItemProperty -Path $KEY -Name Debugger -Value ('"' + $launcher + '"') -Type String
 Write-Output '[3/3] IFEO 已写入'

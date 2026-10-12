@@ -86,6 +86,7 @@ SystemInformer-Zh/
 │   └── systemInformer-zh.ico      启动器图标（内嵌进 EXE）
 ├── dict/                          词典与流水线输入（进版本库）
 │   ├── zh_dict.txt                最终词典（生成物，随仓库提供以便直接用）
+│   ├── zh_dict.pattern.txt        通配符模式表（手工维护，给拼出来的串用）
 │   ├── zh_dict.base.txt           人工基线（第 1 段，勿动）
 │   ├── passolo.txt                Passolo 导出的英中对照（第 2 段来源）
 │   ├── ui_gap.tsv                 从源码抽出的 UI 串清单
@@ -95,6 +96,7 @@ SystemInformer-Zh/
 │   ├── build.ps1                  构建全套产物到 dist\
 │   ├── install.ps1                铺文件 + 写 IFEO
 │   ├── uninstall.ps1              撤销（先摘 IFEO，再谈清理）
+│   ├── collect.ps1                开/关运行期收集（往 Debugger 值里加 --collect）
 │   └── verify-ifeo.ps1            IFEO 端到端验收
 ├── src/
 │   ├── hook/zh_hook.cpp           显示层钩子（编译为 zh_hook.dll）
@@ -108,6 +110,7 @@ SystemInformer-Zh/
     ├── build_zh_dict.py           合并各段 -> 扁平表
     ├── organize.py                扁平表 -> 分类词典
     ├── ui_zh.py                   译文表（第 4 段，手工维护）
+    ├── check_pattern.py           校验通配符模式表
     ├── merge_missed.py            合并运行期收集到的未命中串
     └── verify_*.py / *_probe.py   验证与诊断
 ```
@@ -132,9 +135,10 @@ pwsh -File scripts\build.ps1
 |---|---|
 | `si_zh_launcher.exe` | 启动器，带 `systemInformer-zh.ico` 图标 |
 | `zh_hook.dll` | 显示层钩子，由启动器注入 |
-| `zh_dict.txt` | 词典 |
+| `zh_dict.txt` | 词典（精确匹配） |
+| `zh_dict.pattern.txt` | 通配符模式表（给运行期拼出来的串用） |
 
-脚本结束时会自检图标是否真的内嵌进 EXE、以及启动器是否仍是 GUI 子系统（否则双击会闪黑框）。
+脚本结束时会自检图标是否真的内嵌进 EXE、以及启动器是否仍是 GUI 子系统（否则双击会闪黑框）；构建前还会用 `python tools\check_pattern.py --strict` 校验模式表。
 
 ### 2. 安装
 
@@ -143,7 +147,7 @@ pwsh -File scripts\build.ps1
 pwsh -File scripts\install.ps1
 ```
 
-自动定位 System Informer 安装目录（优先正在运行的实例），把三个产物铺到 `<安装目录>\_zhcn\`，然后写 IFEO。也可以用 `-AppDir` 显式指定。
+自动定位 System Informer 安装目录（优先正在运行的实例），把四个产物铺到 `<安装目录>\_zhcn\`，然后写 IFEO。也可以用 `-AppDir` 显式指定。
 
 想先不动注册表、只铺文件：加 `-NoIfeo`，然后直接双击 `_zhcn\si_zh_launcher.exe`。
 
@@ -192,9 +196,60 @@ UTF-8、无 BOM、LF 换行。每行 `原文<TAB>译文`，`#` 开头是注释�
 
 关于 `[09]`：**System Informer 根本没有 `STRINGTABLE` / `MESSAGE TABLE` / `MENU` 资源**。把 34 个 `.rc` 全扫一遍，只有 `DIALOG` 274 块、`VERSIONINFO` 18 块、`ACCELERATORS` 3 块 —— 它的菜单是 `menubar.c` 用代码搭的，字符串是 C 字面量。所以这两个区在 SI 上不存在对应资源，`[09] = 0` 是事实而非遗漏。
 
+### 通配符模式表
+
+`dict\zh_dict.pattern.txt` 是第二张翻译表，专门对付**运行期拼出来的串** —— 每次运行内容都不一样，精确匹配永远命中不了：
+
+```
+*CPU usage: *	*CPU 使用率：*
+*Physical memory: *	*物理内存：*
+Copy "*"	复制"*"
+```
+
+| 原文里 | 含义 |
+|---|---|
+| `*` | 任意长度（可为空）的片段，并**捕获**它 |
+| `?` | 恰好一个字符，不捕获 |
+| `\*` `\?` `\\` | 转义，表示字面量 |
+
+| 译文里 | 含义 |
+|---|---|
+| `*` | 依次取「还没被用过的」捕获（第 1 个 `*` 取捕获 1） |
+| `\1`..`\9` | 显式取第 N 个捕获（可以换序、可以重复引用） |
+
+三条设计取舍：
+
+- **`*` 取最短可行片段**，不是贪婪。所以 `*Notes: *` 里第一个 `*` 只吃到 `Notes:` 之前那一段，不会把整串吞掉。
+- **译文没引用到的捕获会追加到末尾**。宁可译文啰嗦，也不让界面上的数据（内存用量、PID）悄悄消失。
+- 模式是**反复应用**的（最多 4 遍），所以一条串里的多个字段标签可以一次全换掉。
+
+![状态栏：CPU 使用率 / 物理内存 / 可用内存 —— 这三个值每次刷新都不同，只有模式表能译](docs/screenshot-statusbar.png)
+
+> ⚠️ **多行文本不套模式，这是硬限制。** 「进程提示气泡」那种一整串多行文字，行距是 System Informer 按**原文宽度**算好再逐行画的；把里面的字段标签换成中文，字宽就变了（`Signer:` 是 6 个半角，`签名者：` 是 4 个全角），而它那边并不知道 —— 实测结果是气泡的几行**叠在一起糊成一团**。画错比不译糟糕得多，所以钩子碰到含换行的文本直接跳过模式匹配。气泡因此仍是英文，它产生的未命中记录由 `organize.py` 在合并阶段丢掉。
+
+改完模式表要跑校验（构建时也会自动跑）：
+
+```powershell
+python tools\check_pattern.py             # 报告
+python tools\check_pattern.py --strict    # 警告也算失败（构建用）
+```
+
+它专查「写错了不报错、只会在界面上显示成乱码或悄悄漏数据」的问题：行尾多写一个注释（那会变成译文的一部分）、译文占位符少于原文通配符、`\N` 越界、原文重复、模式太不独特等。
+
 ### 运行期收集未命中的串
 
-钩子会把「界面上出现过、但词典里没有」的串收集到与词典同目录的 **`zh_dict.missed.txt`**，由 `merge_missed.py` 显式合并。
+**默认关闭。** 收集是采集/排障行为（会持续往磁盘追加文件），不该「装好就一直在写」，所以只有给启动器加上 `--collect` 启动参数才会打开：
+
+```powershell
+# 管理员 PowerShell —— 往 IFEO 的 Debugger 值里加/去 --collect
+pwsh -File scripts\collect.ps1 Status   # 只看状态（不需要管理员）
+pwsh -File scripts\collect.ps1 On
+pwsh -File scripts\collect.ps1 Off
+```
+
+打开后，界面上出现过、但词典与模式表都没有的串会被收集到与词典同目录的 **`zh_dict.missed.txt`**，由 `merge_missed.py` 显式合并。
+
+> `collect.ps1 On` 改完会**自动试启一次并验证**：IFEO 的 Debugger 一旦指向不存在的东西，System Informer 会直接起不来，所以脚本发现启动失败会立刻把注册表还原。它还会把启动器路径统一成**带引号**的形式 —— 安装目录含空格时，未加引号的路径交给命令行解析是有歧义的。
 
 为什么不直接写进 `zh_dict.txt`：那个文件是启动时被读的词典，运行期往里追加，进程一旦被强杀就会留下半行，下次加载直接读到脏数据；而且它是生成物，重跑构建就被覆盖。
 
@@ -214,7 +269,9 @@ UTF-8、无 BOM、LF 换行。每行 `原文<TAB>译文`，`#` 开头是注释�
 2. **本机数据比对**：查注册表服务名与 `DisplayName`（含 `@acpi.inf,%X%;…` 间接引用和 `@dll,-id` 资源引用）、驱动名、进程名。
 3. **数值形态**：纯数字、小数、`DOMAIN\user`、文件名样式。
 
-还有一类**必须按模式丢弃**：运行期**拼接**出来的串。例如进程列表的 tooltip 是 `L"Console application: %s (%lu)"`、`L"Signer: %s"` 等片段拼成的整句，收集器只看得见拼完的结果（里面夹着 PID 和进程名），每次运行都不一样，词典的精确匹配永远命中不了。同理还有 `L"Copy \"%s\""`（列名运行时给出）和 `L"Ser&vice (%s)"`（ExtendedServices 插件）。
+还有一类**必须按模式丢弃**：运行期**拼接**出来、又只能整串出现的长文本。典型是进程列表的 tooltip —— 它由 `L"Console application: %s (%lu)"`、`L"Signer: %s"` 等十余个片段拼成一整串多行文字，收集器只看得见拼完的结果（里面夹着 PID 和进程名），每次运行都不一样；而多行文本又不能套模式（见上文），所以它注定译不了。`organize.py` 的 `MISS_DROP_PATTERNS` 在合并阶段把这批丢掉，不让它们淹没待翻译区。
+
+（`L"Copy \"%s\""` 和 `L"Ser&vice (%s)"` 这类**单行**的拼接串不一样 —— 它们在模式表里，直接被译掉了，根本不会进收集文件。）
 
 ### 词典流水线
 
@@ -252,11 +309,10 @@ python tools\organize.py
 
 | 限制 | 原因 |
 |---|---|
-| 状态栏的 `CPU usage: 1.82%` 之类不译 | 源码里是 `L"CPU usage: %s"` 拼好再交给 `SB_SETTEXT`。词典是精确匹配，拿不到拼完的串。要解决得在钩子里加**前缀匹配** |
-| 进程 tooltip 的整段说明不译 | 同上，由十余个片段拼成 |
+| 进程 tooltip 的整段说明不译 | 它由十余个片段（`Notes:` / `Signer:` / `Console application:` / `Flags:` …）拼成一整串**多行**文字，且行距由 SI 按原文宽度算好 —— 换掉其中几个标签会让字宽变化、气泡画糊（实测过）。钩子因此对多行文本不套模式；精确匹配又拿不到拼完的串。**这是目前唯一明确译不了的区域。** |
 | 标题栏上的按钮（如 `Options`）不译 | 非客户区由 DWM 绘制，字符串钩子够不着 |
 | 只覆盖 x64 | 目前只构建 `zh_hook.dll` 的 64 位版本；32 位的 System Informer 不适用 |
-| 词典是精确匹配 | 同一个英文词在不同控件里意思不同时（如 `Free` 在内存列表里是「可用」、在右键菜单里是「释放」），只能取一个。彻底解决需要给词典加**作用域** |
+| 精确词典仍是精确匹配 | 同一个英文词在不同控件里意思不同时（如 `Free` 在内存列表里是「可用」、在右键菜单里是「释放」），只能取一个。彻底解决需要给词典加**作用域**。（拼出来的串已经由模式表覆盖，不再需要前缀匹配。） |
 | `SecurityLayer` 类防病毒软件可能对 IFEO 报警 | IFEO 也是恶意软件常用的持久化位置，这是该方法固有的代价 |
 
 ---
