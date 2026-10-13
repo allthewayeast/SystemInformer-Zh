@@ -276,6 +276,29 @@ python tools\check_pattern.py --strict    # 警告也算失败（构建用）
 
 它专查「写错了不报错、只会在界面上显示成乱码或悄悄漏数据」的问题：行尾多写一个注释（那会变成译文的一部分）、译文占位符少于原文通配符、`\N` 越界、原文重复、模式太不独特等。
 
+### 字体替换表
+
+`dict\zh_font.txt`，**可选**（文件不在就不换字体）。它在**字体被创建的那一刻**把 `LOGFONT` 换掉：换字体名，并按比例换字号。
+
+要解决的具体缺口：System Informer 的界面字体有两个来源，一个是设置项里的「应用程序字体」（管进程列表、属性页表格），另一个是**写死在 exe 里**的 `PhCreateApplicationFont()` → `PhInitializeFont()` → `Microsoft Sans Serif` **8 号**（管页签、菜单栏、表头大字号、迷你信息窗、查找对话框）。后者设置项改不到，只能从代码侧改。中文 Windows 上列表字体本来就是 `Microsoft YaHei UI` 9 号，所以真正的缺口只有那个 8 号。
+
+格式与词典一样是 TAB 分隔，`原字体[|原字号]<TAB>新字体[|新字号]`：
+
+```
+Microsoft Sans Serif|8	Microsoft YaHei UI|9
+```
+
+- 只给字体名 = 只换名字；两侧都给字号 = 按「新/原」等比缩放。缩放的是**像素高度**，所以 DPI 缩放自动跟随（96 DPI 下 8 号 = 11px，乘 9/8 = 12px = 9 号）。
+- **没列出来的字体一律不动** —— 白名单，不是黑名单。
+
+**为什么在创建字体时改、而不是在画字时改**：SI 量文字（`GetTextMetrics`/`GetTextExtent`）用的是同一个 `HFONT`，改在创建处，列宽/页签高/表头高会跟着重算，不会出现「量的是一套、画的是一套」。反过来，在 `DrawText`/`TextOut` 钩子里临时 `SelectObject` 一个新字体是错的 —— SI 已经拿旧字体量好矩形才来画，换掉之后文字会被裁掉或压到相邻元素上。
+
+调试开关：`ZHHK_FONT=0` 关掉替换（A/B 对照）、`ZHHK_FONTLOG=1` 逐条记录 SI 造过的每个字体（`[fontall]`，**这是拿替换前基线的办法**）、`ZHHK_FONTFACE=1` 用 `GetTextFace` 核对 GDI 真正给了哪个字体（`[fontface]`）。验证脚本 `tools\verify\verify_font.py` 会把「不替换」和「替换」各跑一遍并截图对照。
+
+> ⚠️ **不要替换 `Tahoma` / `Segoe UI` 这类系统字体。** 这是踩出来的：把它们也加进表里之后，选项对话框里所有 Edit/Static 的拉丁字母全变成鬼画符（`SystemInformer` → `Pvpbj Rkd g bo`，中文反而正常）。原因是 GDI 把对话框的 `MS Shell Dlg 2` 映射成 `Tahoma` 去建字体，换掉它之后标准控件取到的字形就是错的。**只看主窗口发现不了这个问题**（SI 自己画的文字不受影响），必须开一次对话框看。
+
+钩子里另有三条硬红线，写进表里也不生效：字重为 `FW_DONTCARE(0)` 的跳过（那是 GDI 字体链接在枚举各语系候选字体，字体名横跨宋体/Meiryo UI/Malgun Gothic/Batang… 换掉会污染字体关联表）、`SYMBOL_CHARSET` 的跳过（`Marlett` 这类图标字体的「字符」是字形序号）、以及把字符集归到 `DEFAULT_CHARSET`。
+
 ### 运行期收集未命中的串
 
 **默认关闭。** 收集是采集/排障行为（会持续往磁盘追加文件），不该「装好就一直在写」，所以只有给启动器加上 `--collect` 启动参数才会打开：

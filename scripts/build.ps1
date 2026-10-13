@@ -8,6 +8,7 @@
       dist\zh_hook.dll          显示层钩子，由启动器注入到 SystemInformer.exe
       dist\zh_dict.txt          词典（精确匹配）
       dist\zh_dict.pattern.txt  通配符模式表（拼出来的串）
+      dist\zh_font.txt          字体替换表（换字体名与字号）
 
     只依赖两样东西：Visual Studio 的 C++ 工具链（自动定位），以及仓库里
     src\third_party\minhook 自带的 MinHook 源码。不需要 CMake、不需要 vcpkg。
@@ -46,8 +47,9 @@ $mhInc   = Join-Path $mhRoot 'include'
 $mhSrc   = Join-Path $mhRoot 'src'
 $dictSrc = Join-Path $repo 'dict\zh_dict.txt'
 $patSrc  = Join-Path $repo 'dict\zh_dict.pattern.txt'
+$fontSrc = Join-Path $repo 'dict\zh_font.txt'
 
-foreach ($p in $hookSrc, $lchSrc, $lrcSrc, $dictSrc, $patSrc) {
+foreach ($p in $hookSrc, $lchSrc, $lrcSrc, $dictSrc, $patSrc, $fontSrc) {
     if (-not (Test-Path $p)) { throw "缺少源文件：$p" }
 }
 if (-not (Test-Path (Join-Path $mhSrc 'hook.c'))) { throw "缺少 MinHook 源码：$mhSrc" }
@@ -158,9 +160,10 @@ finally {
     Pop-Location
 }
 
-# ---------------------------------------------------------------- 词典 + 模式表
+# ---------------------------------------------------------------- 词典 + 模式表 + 字体表
 Copy-Item $dictSrc (Join-Path $dist 'zh_dict.txt') -Force
 Copy-Item $patSrc  (Join-Path $dist 'zh_dict.pattern.txt') -Force
+Copy-Item $fontSrc (Join-Path $dist 'zh_font.txt') -Force
 
 Remove-Item $obj -Recurse -Force -ErrorAction SilentlyContinue
 

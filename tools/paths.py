@@ -57,6 +57,7 @@ BASE_DICT = os.path.join(DICT, "zh_dict.base.txt")   # 人工基线（第 1 段�
 RC_LITERALS = os.path.join(DICT, "rc_literals.json")  # .rc 资源串（rc_survey.py 产出）
 UI_GAP_TSV = os.path.join(DICT, "ui_gap.tsv")        # 源码 UI 串清单（ui_gap.py 产出）
 PATTERN = os.path.join(DICT, "zh_dict.pattern.txt")  # 通配符模式表（手工维护）
+FONT = os.path.join(DICT, "zh_font.txt")             # 字体替换表（手工维护）
 
 # ---------------------------------------------------------------- 流水线产物
 MERGED = os.path.join(BUILD, "zh_dict.merged.txt")

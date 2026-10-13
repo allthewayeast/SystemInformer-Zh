@@ -55,7 +55,7 @@ if (-not $Dist) { $Dist = Join-Path $repo 'dist' }
 
 $IFEO_ROOT = 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options'
 $KEY       = "$IFEO_ROOT\SystemInformer.exe"
-$FILES     = 'si_zh_launcher.exe', 'zh_hook.dll', 'zh_dict.txt', 'zh_dict.pattern.txt'
+$FILES     = 'si_zh_launcher.exe', 'zh_hook.dll', 'zh_dict.txt', 'zh_dict.pattern.txt', 'zh_font.txt'
 
 function Assert-Admin {
     $id = [Security.Principal.WindowsIdentity]::GetCurrent()

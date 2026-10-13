@@ -46,9 +46,19 @@
  *                           ……），这些只能靠模式。格式与匹配规则见下方
  *                           「通配符模式翻译」一节。
  *
+ *   3) zh_font.txt          字体替换表。**可选**，没有就不换字体。
+ *                           System Informer 的应用字体（页签/菜单/表头/迷你信息窗）
+ *                           写死成 Microsoft Sans Serif 8 号，设置项改不到它；
+ *                           这张表在字体被创建时把 LOGFONT 换掉（换名 + 等比换字号）。
+ *                           格式与理由见下方「字体替换」一节。
+ *
  * 环境变量
  *   ZHHK_DICT      词典路径。默认 = 本 DLL 同目录的 zh_dict.txt
  *   ZHHK_PATTERN   模式表路径。默认 = 词典同目录的 zh_dict.pattern.txt
+ *   ZHHK_FONT      字体表路径。默认 = 词典同目录的 zh_font.txt
+ *                  取 0/off/false = 关掉字体替换（A/B 对照用）
+ *   ZHHK_FONTLOG   1 = 逐条记录每个被创建的字体（[fontall] 行），不改变行为
+ *   ZHHK_FONTFACE  1 = 核对 GDI 真正解析到的字体名（[fontface] 行），默认关
  *   ZHHK_TRANSLATE 1 = 真正替换文本（默认 0 = 只观察不改）
  *   ZHHK_LOG       日志文件路径（UTF-16LE）。不设则不记日志
  *   ZHHK_LOGALL    1 = 记录所有绘制调用（排障用，日志会很大）
@@ -1743,6 +1753,573 @@ static void LoadPatterns(void)
          g_patCount, lines, nBad, nWarn);
 }
 
+// ---------------------------------------------------------------- 字体替换
+//
+// 为什么需要它：SI 的界面字体有两个来源，都写死在 exe 里，设置项管不到 ——
+//   · 应用字体 PhApplicationFont = PhCreateApplicationFont() → PhInitializeFont()
+//     → PhCreateFontHandle(L"Microsoft Sans Serif", 8, ...)   ← 8 号写死在 guisup.c
+//     它管：页签（tabnew/theme）、菜单栏文字、表头大字号(16/22)、迷你信息窗、查找对话框
+//   · 列表字体 PhCreateTreeWindowFont() 读设置项 "Font"，没设就用
+//     SPI_GETICONTITLELOGFONT（Win10/11 = Segoe UI 9）
+//   设置项「应用程序字体」只改第二条。所以那个 8 号只能从代码侧改。
+//
+// 走哪条路：**在字体被创建时改，不在画文字时改**
+//   SI 的字体全部从两个入口出来：
+//     PhCreateFontHandle(...)    → CreateFont(...)          （应用字体/等宽/迷你窗/图）
+//     PhCreateIconTitleFont 等   → CreateFontIndirect(&lf)  （列表字体/消息字体/字体副本）
+//   在这一层换掉 LOGFONT，SI **自己量文字时用的也是新字体**（GetTextMetrics /
+//   GetTextExtent 都走同一个 HFONT），列宽、页签高、表头高会跟着重算，所以不会出现
+//   「量的是旧字体、画的是新字体」那种错位。
+//   反过来，如果在 DrawText/TextOut 钩子里临时 SelectObject 一个新字体：SI 是拿旧字体
+//   量好矩形才来画的，换掉之后文字会被裁掉或压到相邻元素上 —— 那条路不走。
+//
+//   还没覆盖的：GetStockObject(DEFAULT_GUI_FONT)。系统库存字体不是 CreateFont 造出来的，
+//   钩不到。它只作为兜底出现（有 PhApplicationFont 时基本用不到），先记录在案。
+//
+// 格式（独立文件 zh_font.txt，与词典同样的 TAB 分隔）
+//   原字体[|原字号]<TAB>新字体[|新字号]
+//     · 只给字体名   —— 只换名字，字号不动
+//     · 两侧都给字号 —— 整个字族按「新/原」等比缩放 lfHeight。缩放的是像素高度，
+//       所以 DPI 缩放自动跟随，不需要知道当前是多少 DPI（96 DPI 下 8 号 = -11px，
+//       乘 9/8 后 = -12px，正是 9 号）。
+//     · **没列出来的字体一律不动** —— 等宽字体（Lucida Console/Consolas）和插件自己的
+//       字体因此天然安全，这也是用白名单而不是黑名单的原因。
+//     · 新字体名必须是 ASCII：A 版入口（CreateFontA/CreateFontIndirectA）要把新名字转回
+//       ANSI，非 ASCII 会让那条路静默失效。载入时直接把这类行判为坏行。
+//
+// 开关：ZHHK_FONT=0/off/false 关掉（A/B 对照用）；=其它值是路径。
+// 想看 SI 到底造了哪些字体：ZHHK_FONTLOG=1（逐条记录，不改变行为）。要拿「替换前」的
+// 清单就同时配 ZHHK_FONT=0。
+
+#define FONT_MAX        64
+#define FONT_TEXTLEN    160
+#define FONT_LOG_MAX    60      // 逐条替换日志上限，防日志爆炸
+#define FONT_LOG_ALLMAX 400     // ZHHK_FONTLOG=1 时逐条记录的上限
+
+struct FontEntry
+{
+    wchar_t from[LF_FACESIZE];
+    wchar_t to[LF_FACESIZE];
+    int     fromPt;
+    int     toPt;
+};
+
+static FontEntry g_font[FONT_MAX];
+static int      g_fontCount = 0;
+static wchar_t  g_fontPath[MAX_PATH];
+static BOOL     g_doFont = TRUE;
+static BOOL     g_fontLog = FALSE;
+static volatile LONG g_fontSubst = 0;
+static volatile LONG g_fontAll = 0;
+
+// 只折 ASCII 的比较。口径与 PatUp 一致：界面字体名都是 ASCII，非 ASCII 按原样比。
+static BOOL FontSame(const wchar_t* a, const wchar_t* b)
+{
+    for (; *a && *b; a++, b++)
+    {
+        if (PatUp(*a) != PatUp(*b))
+            return FALSE;
+    }
+    return *a == L'\0' && *b == L'\0';
+}
+
+// 新字体名必须是纯 ASCII（见上面的说明）
+static BOOL FontAscii(const wchar_t* s)
+{
+    for (; *s; s++)
+    {
+        if ((unsigned)*s > 0x7F)
+            return FALSE;
+    }
+    return TRUE;
+}
+
+// 解析 "字体名" 或 "字体名|字号"。字号不在 4..200 就整行判坏。
+static BOOL FontParseSide(const wchar_t* s, wchar_t* face, int faceCap, int* pt)
+{
+    const wchar_t* bar;
+    const wchar_t* end;
+    size_t n;
+
+    *pt = 0;
+
+    for (bar = s; *bar && *bar != L'|'; bar++)
+        ;
+
+    end = bar;
+    while (s < end && (*s == L' ' || *s == L'\t')) s++;
+    while (end > s && (end[-1] == L' ' || end[-1] == L'\t')) end--;
+
+    n = (size_t)(end - s);
+    if (n == 0 || n >= (size_t)faceCap)
+        return FALSE;
+
+    wcsncpy_s(face, (size_t)faceCap, s, n);
+    face[n] = L'\0';
+
+    if (*bar == L'|')
+    {
+        long v = wcstol(bar + 1, NULL, 10);
+        if (v < 4 || v > 200)
+            return FALSE;
+        *pt = (int)v;
+    }
+
+    return TRUE;
+}
+
+// 核心：按白名单换掉字体名（给了字号就同时等比缩放像素高度），并把字符集归到
+// DEFAULT_CHARSET。三个入口共用。
+//
+// 关于字符集：把拉丁字体换成中文界面字体时，字符集跟着归到 DEFAULT_CHARSET 才是语义
+// 正确的（中文直接由该字体渲染，不走字体链接）。SI 自己建字体用的就是 DEFAULT_CHARSET
+// （guisup.c 的 PhCreateFontHandle），这里与它保持同一口径。
+//
+// ★ 别把「选项页文字画成鬼画符」记到字符集头上 —— 我一开始就是这么误判的。
+//   真正原因是「把 Tahoma/Segoe UI 这类系统字体也替换了」：GDI 把对话框的
+//   "MS Shell Dlg 2" 映射成 Tahoma 去建字体，换掉它之后标准控件（Edit/Static）取到的
+//   字形就是错的，表现为 "SystemInformer" 画成 "Pvpbj Rkd g bo"、中文反而正常。
+//   实测对照：规则集加回 Tahoma/Segoe UI 就复现；只留 MS Sans Serif 一条就正常
+//   （截图 build\shots\font_cmp_probeF.png）。详见 dict\zh_font.txt 顶部的第三条红线。
+//
+// ★ SYMBOL_CHARSET 的字体一律不动。那类字体（Marlett、各种图标字体）的「字符」其实是
+//   字形序号，换掉字体名等于换掉整套图标，必须整族跳过。
+//
+// ★ 权重为 FW_DONTCARE(0) 的一律不动。
+//   GDI 的字体链接（font linking）在解析「MS Shell Dlg 2」这类占位字体、以及为各语系
+//   找替代字体时，会**用 CreateFont/CreateFontIndirect 真的把候选字体造一遍**。
+//   实测这些探针长这样：字重=0（FW_DONTCARE）、高度=+10（单元格高）、字体名横跨
+//   宋体 / 新宋体 / Microsoft JhengHei UI / Meiryo UI / Malgun Gothic / Yu Gothic UI /
+//   Arial / Segoe UI / Tahoma —— 一看就是「各语系候选表」，不是界面要用的字体。
+//   换掉它们会污染 GDI 的字体关联表。SI 自己要用的字体永远带真实字重
+//   （FW_NORMAL=400 / FW_BOLD=700），所以「字重为 0 就跳过」这条判据精确且不误伤。
+//   Marlett 恰好也是 0，多一层保护。
+static BOOL FontSubst(wchar_t* face, size_t faceCap, LONG* height, int* charset, LONG weight,
+                      BOOL log)
+{
+    int i;
+
+    if (!g_fontCount || !face[0])
+        return FALSE;
+
+    if (weight == FW_DONTCARE)
+        return FALSE;                       // GDI 字体链接的探针，不是界面字体
+
+    if (charset && *charset == SYMBOL_CHARSET)
+        return FALSE;                       // 图标字体：整族跳过，连名字都不换
+
+    for (i = 0; i < g_fontCount; i++)
+    {
+        const FontEntry* e = &g_font[i];
+        wchar_t from[LF_FACESIZE];
+        LONG h0, h1;
+        int cs0;
+
+        if (!FontSame(face, e->from))
+            continue;
+
+        wcsncpy_s(from, LF_FACESIZE, face, _TRUNCATE);
+
+        cs0 = charset ? *charset : -1;
+
+        h0 = *height;
+        h1 = h0;
+        if (e->fromPt > 0 && e->toPt > 0 && h0 != 0)
+        {
+            // 64 位算：h0 只有几百，但别留溢出的余地
+            h1 = (LONG)(((LONGLONG)h0 * e->toPt) / e->fromPt);
+            if (h1 == 0)
+                h1 = h0;
+            *height = h1;
+        }
+
+        wcsncpy_s(face, faceCap, e->to, _TRUNCATE);
+        if (charset)
+            *charset = DEFAULT_CHARSET;
+
+        if (log)
+        {
+            LONG n = InterlockedIncrement(&g_fontSubst);
+
+            if (n <= FONT_LOG_MAX)
+                Logf(L"[font] #%d \"%s\" h=%d cs=%d w=%d -> \"%s\" h=%d cs=%d",
+                     (int)n, from, (int)h0, cs0, (int)weight, e->to, (int)h1, (int)DEFAULT_CHARSET);
+            else if (n == FONT_LOG_MAX + 1)
+                Logf(L"[font] 替换已超过 %d 条，之后不再逐条记录", FONT_LOG_MAX);
+        }
+
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+// ZHHK_FONTLOG=1 时把每个被创建的字体记一行（不改变任何行为）。
+static void FontLogAll(const wchar_t* api, const wchar_t* face, LONG h, LONG w)
+{
+    LONG n;
+
+    if (!g_fontLog)
+        return;
+
+    n = InterlockedIncrement(&g_fontAll);
+    if (n <= FONT_LOG_ALLMAX)
+        Logf(L"[fontall] %s \"%s\" h=%d w=%d", api, face ? face : L"", (int)h, (int)w);
+}
+
+// ZHHK_FONTFACE=1 时的「事后核对」：把刚建好的字体选进一个内存 DC，用 GetTextFace
+// 读出 GDI **真正解析到**的字体名。
+//
+// 为什么要这一步：CreateFont 成功只说明「请求被接受」，不代表「用的是这个字体」。
+// 字体名写错、字体没装、或者 GDI 觉得该做字体链接，都会悄悄换一个 —— 只看我们
+// 传进去的名字是看不出来的。GetTextFace 读的是实际选中的那个，这是唯一能证的。
+//
+// 默认关闭：它要在钩子里建临时 DC，正常情况下没必要承担这个风险。只在做字体
+// 验证时开，最多核对 FONT_FACE_MAX 次。
+#define FONT_FACE_MAX   20
+
+static BOOL g_fontFace = FALSE;
+static volatile LONG g_fontFaceDone = 0;
+static volatile LONG g_inFaceCheck = 0;
+
+static void FontCheckRealized(HFONT hf, const wchar_t* want)
+{
+    HDC dc;
+    HGDIOBJ old;
+    wchar_t got[LF_FACESIZE];
+
+    if (!g_fontFace || !hf)
+        return;
+    if (InterlockedCompareExchange(&g_inFaceCheck, 1, 0) != 0)
+        return;                                  // 已经在这条链上，别递归下去
+    if (InterlockedIncrement(&g_fontFaceDone) > FONT_FACE_MAX)
+    {
+        InterlockedExchange(&g_inFaceCheck, 0);
+        return;
+    }
+
+    __try
+    {
+        dc = CreateCompatibleDC(NULL);
+        if (dc)
+        {
+            got[0] = L'\0';
+            old = SelectObject(dc, hf);
+            if (!GetTextFaceW(dc, LF_FACESIZE, got))
+                wcsncpy_s(got, LF_FACESIZE, L"(读不到)", _TRUNCATE);
+            SelectObject(dc, old);
+            DeleteDC(dc);
+            Logf(L"[fontface] 请求 \"%s\"，GDI 实际给的是 \"%s\"", want, got);
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+
+    InterlockedExchange(&g_inFaceCheck, 0);
+}
+
+typedef HFONT (WINAPI *CreateFontW_t)(int, int, int, int, int, DWORD, DWORD, DWORD,
+                                      DWORD, DWORD, DWORD, DWORD, DWORD, LPCWSTR);typedef HFONT (WINAPI *CreateFontA_t)(int, int, int, int, int, DWORD, DWORD, DWORD,
+                                      DWORD, DWORD, DWORD, DWORD, DWORD, LPCSTR);
+typedef HFONT (WINAPI *CreateFontIndirectW_t)(const LOGFONTW*);
+typedef HFONT (WINAPI *CreateFontIndirectA_t)(const LOGFONTA*);
+
+static void* g_realCreateFontW = NULL;
+static void* g_realCreateFontA = NULL;
+static void* g_realCreateFontIndirectW = NULL;
+static void* g_realCreateFontIndirectA = NULL;
+
+static HFONT WINAPI HookCreateFontW(int cHeight, int cWidth, int cEscapement, int cOrientation,
+                                    int cWeight, DWORD bItalic, DWORD bUnderline, DWORD bStrikeOut,
+                                    DWORD iCharSet, DWORD iOutPrecision, DWORD iClipPrecision,
+                                    DWORD iQuality, DWORD iPitchAndFamily, LPCWSTR pszFaceName)
+{
+    wchar_t face[LF_FACESIZE];
+    LONG h = cHeight;
+    int cs = (int)iCharSet;
+    HFONT hf;
+    BOOL sub = FALSE;
+
+    face[0] = L'\0';
+    if (pszFaceName)
+        wcsncpy_s(face, LF_FACESIZE, pszFaceName, _TRUNCATE);
+
+    FontLogAll(L"CreateFont", face, (LONG)cHeight, (LONG)cWeight);
+
+    if (g_doFont)
+        sub = FontSubst(face, LF_FACESIZE, &h, &cs, (LONG)cWeight, TRUE);
+    if (sub)
+    {
+        cHeight = (int)h;
+        iCharSet = (DWORD)cs;
+    }
+
+    hf = ((CreateFontW_t)g_realCreateFontW)(cHeight, cWidth, cEscapement, cOrientation,
+        cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision,
+        iQuality, iPitchAndFamily, face[0] ? face : pszFaceName);
+
+    if (sub)
+        FontCheckRealized(hf, face);
+
+    return hf;
+}
+
+static HFONT WINAPI HookCreateFontA(int cHeight, int cWidth, int cEscapement, int cOrientation,
+                                    int cWeight, DWORD bItalic, DWORD bUnderline, DWORD bStrikeOut,
+                                    DWORD iCharSet, DWORD iOutPrecision, DWORD iClipPrecision,
+                                    DWORD iQuality, DWORD iPitchAndFamily, LPCSTR pszFaceName)
+{
+    char faceA[LF_FACESIZE];
+    wchar_t face[LF_FACESIZE];
+    LONG h = cHeight;
+    int cs = (int)iCharSet;
+
+    faceA[0] = '\0';
+    if (pszFaceName)
+        strncpy_s(faceA, LF_FACESIZE, pszFaceName, _TRUNCATE);
+
+    if (g_doFont && faceA[0] &&
+        MultiByteToWideChar(CP_ACP, 0, faceA, -1, face, LF_FACESIZE) > 0 &&
+        FontSubst(face, LF_FACESIZE, &h, &cs, (LONG)cWeight, TRUE))
+    {
+        // 新名字转不回 ANSI 就整个放弃（名字没换，高度/字符集也不能换，否则是不一致的字体）
+        if (WideCharToMultiByte(CP_ACP, 0, face, -1, faceA, LF_FACESIZE, NULL, NULL) > 0)
+        {
+            cHeight = (int)h;
+            iCharSet = (DWORD)cs;
+        }
+    }
+
+    return ((CreateFontA_t)g_realCreateFontA)(cHeight, cWidth, cEscapement, cOrientation,
+        cWeight, bItalic, bUnderline, bStrikeOut, iCharSet, iOutPrecision, iClipPrecision,
+        iQuality, iPitchAndFamily, faceA[0] ? faceA : pszFaceName);
+}
+
+static HFONT WINAPI HookCreateFontIndirectW(const LOGFONTW* lplf)
+{
+    LOGFONTW lf;
+    HFONT hf;
+    BOOL sub = FALSE;
+
+    if (!lplf)
+        return ((CreateFontIndirectW_t)g_realCreateFontIndirectW)(lplf);
+
+    __try
+    {
+        lf = *lplf;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return ((CreateFontIndirectW_t)g_realCreateFontIndirectW)(lplf);
+    }
+
+    FontLogAll(L"CreateFontIndirect", lf.lfFaceName, lf.lfHeight, lf.lfWeight);
+
+    if (g_doFont)
+    {
+        int cs = (int)lf.lfCharSet;
+
+        sub = FontSubst(lf.lfFaceName, LF_FACESIZE, &lf.lfHeight, &cs, lf.lfWeight, TRUE);
+        if (sub)
+            lf.lfCharSet = (BYTE)cs;
+    }
+
+    // 传副本，不改调用方的缓冲区：有的调用方拿同一个 LOGFONT 反复建字体/算尺寸，
+    // 就地改掉会让它后面的判断也跟着变。
+    hf = ((CreateFontIndirectW_t)g_realCreateFontIndirectW)(&lf);
+
+    if (sub)
+        FontCheckRealized(hf, lf.lfFaceName);
+
+    return hf;
+}
+
+static HFONT WINAPI HookCreateFontIndirectA(const LOGFONTA* lplf)
+{
+    LOGFONTA la;
+    wchar_t face[LF_FACESIZE];
+    LONG h;
+
+    if (!lplf)
+        return ((CreateFontIndirectA_t)g_realCreateFontIndirectA)(lplf);
+
+    __try
+    {
+        la = *lplf;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return ((CreateFontIndirectA_t)g_realCreateFontIndirectA)(lplf);
+    }
+
+    if (!g_doFont || !la.lfFaceName[0])
+        return ((CreateFontIndirectA_t)g_realCreateFontIndirectA)(&la);
+
+    if (MultiByteToWideChar(CP_ACP, 0, la.lfFaceName, -1, face, LF_FACESIZE) <= 0)
+        return ((CreateFontIndirectA_t)g_realCreateFontIndirectA)(&la);
+
+    h = la.lfHeight;
+    {
+        int cs = (int)la.lfCharSet;
+
+        if (FontSubst(face, LF_FACESIZE, &h, &cs, la.lfWeight, TRUE))
+        {
+            if (WideCharToMultiByte(CP_ACP, 0, face, -1, la.lfFaceName, LF_FACESIZE, NULL, NULL) > 0)
+            {
+                la.lfHeight = h;
+                la.lfCharSet = (BYTE)cs;
+            }
+        }
+    }
+
+    return ((CreateFontIndirectA_t)g_realCreateFontIndirectA)(&la);
+}
+
+static void LoadFonts(void)
+{
+    char* raw = NULL;
+    DWORD size = 0;
+    char* line;
+    char* next;
+    int lines = 0, nBad = 0, nDup = 0;
+
+    if (!g_doFont)
+    {
+        Logf(L"[font] 字体替换已关闭（ZHHK_FONT）");
+        return;
+    }
+
+    if (!*g_fontPath)
+        return;
+
+    if (!ReadWholeFileW(g_fontPath, &raw, &size))
+    {
+        Logf(L"[font] 没有字体表（可选，不是错误）: %s", g_fontPath);
+        return;
+    }
+
+    Logf(L"[font] path=%s (%lu 字节)", g_fontPath, size);
+
+    line = raw;
+    while (line && *line)
+    {
+        char* nl;
+        char* tab;
+
+        next = line;
+        nl = strchr(line, '\n');
+        if (nl)
+        {
+            *nl = '\0';
+            next = nl + 1;
+        }
+        else
+        {
+            next = NULL;
+        }
+
+        lines++;
+
+        if (line[0] == (char)0xEF && line[1] == (char)0xBB && line[2] == (char)0xBF)
+            line += 3;
+
+        if (line[0] != '\0' && line[0] != '#')
+        {
+            tab = strchr(line, '\t');
+            if (!tab)
+            {
+                nBad++;
+                if (nBad <= 3)
+                    Logf(L"[font] 第 %d 行没有 TAB，已忽略: \"%hs\"", lines, line);
+            }
+            else
+            {
+                wchar_t left[FONT_TEXTLEN], right[FONT_TEXTLEN];
+                wchar_t from[LF_FACESIZE], to[LF_FACESIZE];
+                int fromPt = 0, toPt = 0;
+                size_t n;
+
+                *tab = '\0';
+                if (MultiByteToWideChar(CP_UTF8, 0, line, -1, left, FONT_TEXTLEN) <= 0 ||
+                    MultiByteToWideChar(CP_UTF8, 0, tab + 1, -1, right, FONT_TEXTLEN) <= 0)
+                {
+                    nBad++;
+                    if (nBad <= 3)
+                        Logf(L"[font] 第 %d 行 UTF-8 转换失败", lines);
+                    line = next;
+                    continue;
+                }
+
+                n = wcslen(left);
+                if (n > 0 && left[n - 1] == L'\r') left[n - 1] = L'\0';
+                n = wcslen(right);
+                if (n > 0 && right[n - 1] == L'\r') right[n - 1] = L'\0';
+
+                if (!FontParseSide(left, from, LF_FACESIZE, &fromPt) ||
+                    !FontParseSide(right, to, LF_FACESIZE, &toPt))
+                {
+                    nBad++;
+                    if (nBad <= 3)
+                        Logf(L"[font] 第 %d 行格式不合法（应为「原字体[|字号]<TAB>新字体[|字号]」，"
+                             L"字号 4~200）", lines);
+                }
+                else if (!FontAscii(to))
+                {
+                    nBad++;
+                    if (nBad <= 3)
+                        Logf(L"[font] 第 %d 行的新字体名不是 ASCII，A 版入口会失效，已忽略: \"%s\"",
+                             lines, to);
+                }
+                else if (g_fontCount >= FONT_MAX)
+                {
+                    nBad++;
+                    if (nBad <= 3)
+                        Logf(L"[font] 规则数超过上限 %d，多余的被忽略", FONT_MAX);
+                }
+                else
+                {
+                    int i;
+                    BOOL dup = FALSE;
+
+                    for (i = 0; i < g_fontCount; i++)
+                    {
+                        if (FontSame(g_font[i].from, from))
+                        {
+                            dup = TRUE;
+                            break;
+                        }
+                    }
+
+                    if (dup)
+                    {
+                        // 靠前的先用；重复的原字体名一律忽略并记数，免得两条规则
+                        // 抢同一个字体、结果取决于文件顺序而没人发现。
+                        nDup++;
+                        Logf(L"[font] 第 %d 行的原字体 \"%s\" 已出现过，已忽略", lines, from);
+                    }
+                    else
+                    {
+                        FontEntry* e = &g_font[g_fontCount];
+
+                        wcscpy_s(e->from, LF_FACESIZE, from);
+                        wcscpy_s(e->to, LF_FACESIZE, to);
+                        e->fromPt = fromPt;
+                        e->toPt = toPt;
+                        g_fontCount++;
+                    }
+                }
+            }
+        }
+
+        line = next;
+    }
+
+    HeapFree(GetProcessHeap(), 0, raw);
+    Logf(L"[font] 载入 %d 条替换规则（扫描 %d 行 / 坏行 %d / 重复 %d）",
+         g_fontCount, lines, nBad, nDup);
+}
+
 // ---------------------------------------------------------------- 翻译
 
 // 词典查找（输入已在 key 中）——哈希比对，未命中才做全等比较
@@ -2470,6 +3047,10 @@ static void* PickHook(const char* dll, const char* func)
         if (_stricmp(func, "TextOutA") == 0)     return (void*)&HookTextOutA;
         if (_stricmp(func, "ExtTextOutW") == 0)  return (void*)&HookExtTextOutW;
         if (_stricmp(func, "ExtTextOutA") == 0)  return (void*)&HookExtTextOutA;
+        if (_stricmp(func, "CreateFontW") == 0)         return (void*)&HookCreateFontW;
+        if (_stricmp(func, "CreateFontA") == 0)         return (void*)&HookCreateFontA;
+        if (_stricmp(func, "CreateFontIndirectW") == 0) return (void*)&HookCreateFontIndirectW;
+        if (_stricmp(func, "CreateFontIndirectA") == 0) return (void*)&HookCreateFontIndirectA;
     }
     return NULL;
 }
@@ -2489,6 +3070,10 @@ static void* PickReal(const char* dll, const char* func)
         if (_stricmp(func, "TextOutA") == 0)     return g_realTextOutA;
         if (_stricmp(func, "ExtTextOutW") == 0)  return g_realExtTextOutW;
         if (_stricmp(func, "ExtTextOutA") == 0)  return g_realExtTextOutA;
+        if (_stricmp(func, "CreateFontW") == 0)         return g_realCreateFontW;
+        if (_stricmp(func, "CreateFontA") == 0)         return g_realCreateFontA;
+        if (_stricmp(func, "CreateFontIndirectW") == 0) return g_realCreateFontIndirectW;
+        if (_stricmp(func, "CreateFontIndirectA") == 0) return g_realCreateFontIndirectA;
     }
     return NULL;
 }
@@ -2498,6 +3083,7 @@ static void* PickReal(const char* dll, const char* func)
 static const char* const kHookNames[] = {
     "SendMessageW", "DrawTextW", "DrawTextA", "DrawTextExW",
     "TextOutW", "TextOutA", "ExtTextOutW", "ExtTextOutA",
+    "CreateFontW", "CreateFontA", "CreateFontIndirectW", "CreateFontIndirectA",
     NULL
 };
 
@@ -2658,6 +3244,14 @@ static void InstallHooks(void)
             { L"gdi32.dll",  "TextOutA",     (LPVOID)&HookTextOutA,     &g_realTextOutA,     g_needAnsi },
             { L"gdi32.dll",  "ExtTextOutW",  (LPVOID)&HookExtTextOutW,  &g_realExtTextOutW,  g_needXO },
             { L"gdi32.dll",  "ExtTextOutA",  (LPVOID)&HookExtTextOutA,  &g_realExtTextOutA,  g_needAnsi },
+            // 字体替换（表在 zh_font.txt）。CreateFont 与 CreateFontIndirect **两条都要挂**：
+            // SI 的应用字体走 CreateFont（guisup.c 的 PhCreateFontHandle），列表字体走
+            // CreateFontIndirect —— 只挂一条会漏掉一半界面。关掉替换（ZHHK_FONT=0）时
+            // 仍要建钩子，否则 ZHHK_FONTLOG 采集不到「替换前」的清单。
+            { L"gdi32.dll",  "CreateFontW",         (LPVOID)&HookCreateFontW,         &g_realCreateFontW,         (g_doFont || g_fontLog) },
+            { L"gdi32.dll",  "CreateFontA",         (LPVOID)&HookCreateFontA,         &g_realCreateFontA,         (g_doFont || g_fontLog) },
+            { L"gdi32.dll",  "CreateFontIndirectW", (LPVOID)&HookCreateFontIndirectW, &g_realCreateFontIndirectW, (g_doFont || g_fontLog) },
+            { L"gdi32.dll",  "CreateFontIndirectA", (LPVOID)&HookCreateFontIndirectA, &g_realCreateFontIndirectA, (g_doFont || g_fontLog) },
             // 退出钩子：SI 自己实现了 ExitProcess/TerminateProcess 的桩函数
             // （phlib\apistubs.cpp），绕开 kernel32 直接进 ntdll，所以只能钩这里。
             { L"ntdll.dll",  "NtTerminateProcess", (LPVOID)&HookNtTerminateProcess, &g_realNtTerminateProcess, TRUE },
@@ -2771,6 +3365,20 @@ static void ReadEnv(void)
     if (n == 0 || n >= MAX_PATH)
         g_patPath[0] = L'\0';
 
+    // 字体表：未设 = 用默认路径（与词典同目录）；0/off/false = 关掉字体替换（A/B 对照）；
+    // 其它值 = 显式路径。关掉时仍然建钩子，好让 ZHHK_FONTLOG 能采到「替换前」的清单。
+    n = GetEnvironmentVariableW(L"ZHHK_FONT", g_fontPath, MAX_PATH);
+    if (n == 0 || n >= MAX_PATH)
+    {
+        g_fontPath[0] = L'\0';
+    }
+    else if (_wcsicmp(g_fontPath, L"0") == 0 || _wcsicmp(g_fontPath, L"off") == 0 ||
+             _wcsicmp(g_fontPath, L"false") == 0)
+    {
+        g_doFont = FALSE;
+        g_fontPath[0] = L'\0';
+    }
+
     g_doTranslate = GetEnvironmentVariableW(L"ZHHK_TRANSLATE", NULL, 0) > 0;
     g_traceTb = GetEnvironmentVariableW(L"ZHHK_TRACETB", NULL, 0) > 0;
 
@@ -2787,6 +3395,8 @@ static void ReadEnv(void)
     }
     g_logAll = GetEnvironmentVariableW(L"ZHHK_LOGALL", NULL, 0) > 0;
     g_missAll = GetEnvironmentVariableW(L"ZHHK_MISSALL", NULL, 0) > 0;
+    g_fontLog = GetEnvironmentVariableW(L"ZHHK_FONTLOG", NULL, 0) > 0;
+    g_fontFace = GetEnvironmentVariableW(L"ZHHK_FONTFACE", NULL, 0) > 0;
 
     if (!g_dictPath[0] && g_logPath[0])
     {
@@ -2806,6 +3416,16 @@ static void ReadEnv(void)
         slash = wcsrchr(g_patPath, L'\\');
         if (slash)
             wcscpy_s(slash + 1, MAX_PATH - (slash + 1 - g_patPath), L"zh_dict.pattern.txt");
+    }
+
+    // 字体表默认也与词典同目录。同样可选：文件不在就只是不做字体替换。
+    if (g_doFont && !g_fontPath[0] && g_dictPath[0])
+    {
+        wchar_t* slash;
+        wcscpy_s(g_fontPath, MAX_PATH, g_dictPath);
+        slash = wcsrchr(g_fontPath, L'\\');
+        if (slash)
+            wcscpy_s(slash + 1, MAX_PATH - (slash + 1 - g_fontPath), L"zh_font.txt");
     }
 
     // ------------------------------------------------------------------
@@ -2919,6 +3539,10 @@ BOOL WINAPI DllMain(HINSTANCE self, DWORD reason, LPVOID reserved)
         // 通配符模式表（可选）。必须在 LoadDict 之后：g_patPath 的默认值是从
         // g_dictPath 派生的。
         LoadPatterns();
+
+        // 字体替换表（可选）。同样要在 LoadDict 之后（g_fontPath 的默认值来自 g_dictPath），
+        // 且必须在 InstallHooks 之前 —— 钩子表的 on 标志要读 g_doFont/g_fontLog。
+        LoadFonts();
 
         // 运行时未命中收集：先读回历史（跨次运行不重复），再开追加句柄。
         // 这两步在 g_missEnabled 为假时直接返回 —— 默认就是关的。

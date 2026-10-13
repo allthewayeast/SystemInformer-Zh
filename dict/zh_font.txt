@@ -1,0 +1,60 @@
+# System Informer 中文 · 字体替换表
+# ===========================================================================
+# 干什么：钩子在**字体被创建的那一刻**把 LOGFONT 换掉 —— 换字体名、按比例换字号。
+# 界面上所有文字都跟着变，不需要重编 System Informer。
+#
+# 为什么需要它（不是配置项能解决的事）：
+#   System Informer 的界面字体有两个来源 ——
+#     · 应用字体  PhCreateApplicationFont() → PhInitializeFont()
+#                 → PhCreateFontHandle(L"Microsoft Sans Serif", 8, ...)
+#                 那个 8 号写死在 phlib\guisup.c 的 PhInitializeFont 里。
+#                 它管：页签、菜单栏文字、表头大字号、迷你信息窗、查找对话框、
+#                 以及各对话框里的控件字体。
+#     · 列表字体  PhCreateTreeWindowFont() 读设置项 "Font"；没设就用
+#                 SPI_GETICONTITLELOGFONT。
+#                 它管：进程列表、属性页里的所有表格/树。
+#
+#   第二条在中文 Windows 上**本来就是 Microsoft YaHei UI 9 号**（系统图标标题字体
+#   就是它）—— 实测 [fontall] 里 SI 建的列表字体就是 "Microsoft YaHei UI" h=-12。
+#   所以真正的缺口只有第一条那个写死的 8 号，本表只补它。
+# ===========================================================================
+#
+# 格式：每行「原字体[|原字号]<TAB>新字体[|新字号]」，# 开头是注释。
+#   · 只给字体名      只换名字，字号不动
+#   · 两侧都给字号    整个字族按「新/原」等比缩放
+#                     缩放的是**像素高度**，所以 DPI 缩放自动跟随 —— 不需要知道
+#                     当前是多少 DPI。96 DPI 下 8 号 = 11px，乘 9/8 = 12px，正是 9 号。
+#   · 没列出来的字体一律不动。**这是白名单，不是黑名单。**
+#   · 新字体名必须是纯 ASCII（A 版入口 CreateFontA/CreateFontIndirectA 要把它转回
+#     ANSI，非 ASCII 会让那条路静默失效，载入时判为坏行）。
+#
+# 三条不能碰的红线（都在钩子里硬编码了，写进来也不会生效）：
+#   1. 字重 = 0（FW_DONTCARE）的跳过。
+#      GDI 的字体链接在解析「MS Shell Dlg 2」和各语系替代字体时，会真的把候选字体
+#      造一遍：字重 0、高度 +10，字体名横跨宋体/新宋体/Microsoft JhengHei UI/
+#      Meiryo UI/Malgun Gothic/Yu Gothic UI/Arial/Segoe UI/Tahoma。换掉它们会污染
+#      GDI 的字体关联表。SI 自己要用的字体永远带真实字重，所以这条判据精确且不误伤。
+#   2. 字符集 = SYMBOL_CHARSET 的跳过。图标字体（Marlett 之类）的「字符」其实是
+#      字形序号，换字体名等于换掉整套图标。
+#   3. ★ 不要替换 Tahoma / Segoe UI 这类**系统提供的、会被标准控件拿去用**的字体。
+#      这条是踩出来的：把它们也换掉之后，选项对话框里所有 Edit/Static 的拉丁字母
+#      全变成鬼画符（"SystemInformer" → "Pvpbj Rkd g bo"，中文反而正常）。
+#      原因是 GDI 把对话框的 "MS Shell Dlg 2" 映射成 Tahoma 去建字体，换掉它之后
+#      标准控件取到的字形是错的。实测对照：
+#        规则 {MS Sans Serif, Tahoma, Segoe UI} → 选项页花屏
+#        规则 {MS Sans Serif}                   → 选项页正常（截图见 docs\font-compare-options.png）
+#      界面由 SI 自己画的那些文字（主窗口页签/菜单/列表）不受影响，所以只看主窗口
+#      是发现不了这个问题的 —— 必须开一次对话框看。
+# ===========================================================================
+#
+# 关掉整张表：环境变量 ZHHK_FONT=0（或把本文件清空/改名）。
+# 想先看看 System Informer 到底造了哪些字体（做替换前的基线）：
+#   ZHHK_FONT=0  ZHHK_FONTLOG=1   然后看 zh_hook.log 里的 [fontall] 行。
+# 核对 GDI 真正给了哪个字体：ZHHK_FONTFACE=1（看 [fontface] 行）。
+#
+# 一个已知的边界：GetStockObject(DEFAULT_GUI_FONT) 拿到的系统库存字体不是
+# CreateFont 造出来的，钩不到。它只在没有应用字体时作兜底，界面里基本见不到；
+# 真遇到了表现为某处文字仍是 Microsoft Sans Serif 8 号。
+
+# 唯一的规则：SI 写死的应用字体，8 号（-11px）→ 雅黑 UI 9 号（-12px）
+Microsoft Sans Serif|8	Microsoft YaHei UI|9
