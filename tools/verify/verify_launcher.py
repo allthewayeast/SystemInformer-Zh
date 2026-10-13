@@ -356,6 +356,11 @@ def tail(path, n=40, enc='utf-16'):
 
 
 def main():
+    # build.ps1 -Clean 会连 build\ 一起删掉，而截图落在 build\shots\ 下 ——
+    # 不先建目录就会在写完窗口状态之后崩在 write_png 上（查到这一步之前，
+    # 前面所有判定其实都已经过了，但整个脚本非零退出）。
+    paths.ensure(paths.SHOTS)
+
     for p in (LLOG, HLOG, SHOT):
         if os.path.exists(p):
             os.remove(p)
