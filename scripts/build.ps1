@@ -151,7 +151,7 @@ try {
     # ------------------------------------------------------------ 4) 启动器
     Invoke-Vc ("cl /nologo /O2 /MT /W3 /utf-8 /DUNICODE /D_UNICODE `"$lchSrc`" `"$res`" " +
                "/Fe:`"$dist\si_zh_launcher.exe`" " +
-               "/link /SUBSYSTEM:WINDOWS user32.lib kernel32.lib shell32.lib psapi.lib") `
+               "/link /SUBSYSTEM:WINDOWS user32.lib kernel32.lib shell32.lib psapi.lib advapi32.lib") `
               '[4/4] 编译 si_zh_launcher.exe'
 }
 finally {

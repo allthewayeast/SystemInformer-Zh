@@ -6,6 +6,10 @@
     设计原则：**先保证 System Informer 能照常启动**，再谈清理。
     所以第一步永远是删掉 Debugger 值 —— 那一步做完就不再有任何东西拦在启动路径上。
 
+    只摘注册表这一步也可以由启动器做：`si_zh_launcher.exe --uninstall`（会自己弹
+    UAC）。本脚本仍然是**兜底手段**：它不依赖 _zhcn 目录是否存在，所以在目录已经
+    被删掉、启动器已经没了的情况下，它照样能把 System Informer 救回原生启动。
+
 .PARAMETER AppDir
     System Informer 的安装目录。不传就自动找（同 install.ps1）。
 

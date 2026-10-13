@@ -18,6 +18,12 @@
             而且一旦 Debugger 指向的东西有问题，程序就起不来 —— 所以务必保留
             uninstall.ps1 的一键还原。
 
+    第 3 步（写注册表）也可以由启动器自己做：`si_zh_launcher.exe --install`，
+    它会自己弹 UAC、写完回读校验，不需要管理员 PowerShell。两者写的是同一个值，
+    只有一处差别：启动器那条路会**保留** Debugger 里已有的附加参数（例如
+    collect.ps1 挂上的 --collect），而本脚本是直接覆盖成「带引号的启动器路径」。
+    如果你正在用 --collect 收集未命中，重新安装后记得再跑一次 collect.ps1 -On。
+
 .PARAMETER AppDir
     System Informer 的安装目录。不传就自动找：优先正在运行的实例，其次
     常见安装位置。

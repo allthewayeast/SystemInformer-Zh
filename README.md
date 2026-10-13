@@ -76,6 +76,37 @@ CreateProcessW(target,
 - System Informer 的列表（`PhTreeNew`）是**自绘**的：在自己的 `WM_PAINT` 里建内存 DC、画完再 `BitBlt`。`WindowFromDC()` 对内存 DC 返回 `NULL`，所以必须钩 `BeginPaint` / `EndPaint` 自己维护「当前正在绘制的窗口」。
 - 每个 `PhTreeNew` 下挂着**两个** `SysHeader32`，先建的是列数为 0 的空壳。取「第一个匹配到的」会永远拿到空壳。
 
+### 启动器的命令行
+
+```
+si_zh_launcher.exe                          启动 ..\SystemInformer.exe
+si_zh_launcher.exe <target.exe> [args]      IFEO 就是这样调用它的
+si_zh_launcher.exe --app <path> [args]
+si_zh_launcher.exe --install                装 IFEO 劫持（只动注册表，不启动程序）
+si_zh_launcher.exe --uninstall              卸 IFEO 劫持（只动注册表，不启动程序）
+```
+
+| 选项 | 作用 |
+|---|---|
+| `--install` | 把 `HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\<目标映像名>` 的 `Debugger` 写成自己（**带引号**）。键名取目标 exe 的文件名（默认 `SystemInformer.exe`）；已有附加参数（如 `--collect`）会被保留；改动前的旧值备份到 `_zhcn\ifeo_backup.txt`。**需要管理员** —— 没提权时它会自己弹一次 UAC 再干活。 |
+| `--uninstall` | 删掉那个 `Debugger` 值；键若已空则连带删除，键里还有别的值就保留。 |
+| `--quiet` | 不弹结果对话框，只回退出码（给脚本用）。 |
+| `--collect` | 打开运行时未命中收集（默认关，见下文）。 |
+| `--log` / `--no-wait` / `--check` | 写日志 / 启动完即退 / 只显示解析到的配置 |
+
+`--install` / `--uninstall` 做的就是 `scripts\install.ps1` / `uninstall.ps1` 里**注册表那一步**（铺文件仍然归 install.ps1），区别只在于不必事先开一个管理员 PowerShell。
+
+两个开关对注册表的**改动一律走 `reg.exe`**，读取走 Win32 API：每条 `reg.exe` 命令都会写进 `--log` 的日志，可以照抄手动复现；而读取不能用 `reg query`，因为它的输出是控制台代码页编码的，而值里含中文路径。
+
+写完一定会**回读校验**。`reg.exe` 的退出码不算数 —— 组策略禁止注册表工具、或安全软件拦 IFEO 写入时，退出码可能好看而值根本没落地。回读到的值和要求写的不一致就报失败，并把期望值、实际值和那条命令一起摆在对话框里。
+
+回归验证（默认在 HKCU 下跑，不需要管理员，不会碰真实 IFEO）：
+
+```powershell
+python tools\verify\verify_ifeo.py           # 33 项：装/卸/备份/保留参数/回读/失败注入
+python tools\verify\verify_ifeo.py --real    # 动真实键（需管理员），跑完自动还原
+```
+
 ---
 
 ## 目录结构
@@ -151,6 +182,12 @@ pwsh -File scripts\install.ps1
 
 想先不动注册表、只铺文件：加 `-NoIfeo`，然后直接双击 `_zhcn\si_zh_launcher.exe`。
 
+文件铺好之后，写注册表这一步也可以交给启动器自己做 —— 它会自己弹一次 UAC，不必先开管理员 PowerShell：
+
+```powershell
+D:\...\System Informer\_zhcn\si_zh_launcher.exe --install
+```
+
 装完双击原来的图标即可。**如果 System Informer 当时正在运行，需要重启它** —— 词典是启动时一次性读入的，正在跑的进程不会变中文。
 
 ### 3. 卸载
@@ -159,6 +196,9 @@ pwsh -File scripts\install.ps1
 # 管理员 PowerShell
 pwsh -File scripts\uninstall.ps1              # 只摘 IFEO，程序文件保留
 pwsh -File scripts\uninstall.ps1 -RemoveFiles # 连 _zhcn 目录一起删
+
+# 或者只摘注册表那一步（会弹 UAC，不必开管理员 PowerShell）
+D:\...\System Informer\_zhcn\si_zh_launcher.exe --uninstall
 ```
 
 > ⚠️ **不要手工删除 `_zhcn` 目录**。IFEO 的 Debugger 指向 `_zhcn\si_zh_launcher.exe`，指向的文件不存在时 System Informer **会直接启动失败**（报「系统找不到指定的文件」），不会回退到原生方式。要删就先跑 `uninstall.ps1` —— 它的第一步永远是摘掉 Debugger 值。
